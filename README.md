@@ -2,23 +2,25 @@
 
 The lecture notes and materials are contained in each week's respective directory.
 
-Each week we will provide:
+### Each week we will provide:
 
 - HTML slides laid out in a 2D grid by topic
 - A PDF file of the slides for easy printing
 - The raw source of the files in an R Markdown (.Rmd) file
 - All of the R code executed to make the slides
 
-To download any particular file:
+### To download any particular file:
 
 - Click on the file name
 - The contents of the file may be partially rendered in your web browser by GitHub
 - To download the file, right click the "Raw" box and choose "Download Linked File"
 - The file can then be found wherever your browser usually places downloaded files
 
-To view the slides in HTML format:
+### To view the slides in HTML format:
 
 - Download the week's html file (e.g., week1.html) as described above
+- Or a direct link to the HTML slides for all weeks can be found on the course web page, [Course Materials](http://sml201.github.io/course_materials/)
+
 - Double click the html file, which will open it in your web browser
 - Press `esc` to see the 2D layout of the slides
     - The topics are along the top
