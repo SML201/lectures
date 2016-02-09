@@ -20,7 +20,6 @@ The lecture notes and materials are contained in each week's respective director
 
 - Download the week's html file (e.g., week1.html) as described above
 - Or a direct link to the HTML slides for all weeks can be found on the course web page, [Course Materials](http://sml201.github.io/course_materials/)
-
 - Double click the html file, which will open it in your web browser
 - Press `esc` to see the 2D layout of the slides
     - The topics are along the top
