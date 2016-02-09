@@ -25,8 +25,8 @@ To view the slides in HTML format:
     - The slides for each topic are below the main topic slide
 - Click on any slide to leave the slide deck 2D overview
 - To navigate the slides:
-    - The left/right arrows moves between topics
-    - The up/down arrows moves along slides within a topic
+    - The left/right arrows move between topics
+    - The up/down arrows move along slides within a topic
     - You can press the space bar to move linearly along the slides and avoid messing with the 2D layout
     - Pressing `Shift-Space` moves backwards in a linear fashion through the slides
-- You can press the `F` to enter full screen mode but this may not work well on all browsers
+- You can press the `F` key to enter full screen mode but this may not work well on all browsers
