@@ -197,7 +197,12 @@ $logic
   counting char logic
 1        1    a  TRUE
 2        2    b FALSE
-3        3    c  TRUE</code></pre>
+3        3    c  TRUE
+&gt; 
+&gt; nrow(df)
+[1] 3
+&gt; ncol(df)
+[1] 3</code></pre>
 </section><section id="data-frames-2" class="slide level2">
 <h1>Data Frames</h1>
 <pre class="r"><code>&gt; dim(df)
@@ -275,6 +280,11 @@ West  2  4  6
 <td style="text-align: left;"><code>row.names()</code></td>
 </tr>
 <tr class="odd">
+<td style="text-align: left;">data frame</td>
+<td style="text-align: left;"><code>colnames()</code></td>
+<td style="text-align: left;"><code>rownames()</code></td>
+</tr>
+<tr class="even">
 <td style="text-align: left;">matrix</td>
 <td style="text-align: left;"><code>colnames()</code></td>
 <td style="text-align: left;"><code>rownames()</code></td>
@@ -763,6 +773,16 @@ length
 [1,]    1    6    6
 [2,]    8    5   18</code></pre>
 <p>What happened this time?</p>
+</section><section id="vectorized-boolean-logic" class="slide level2">
+<h1>Vectorized Boolean Logic</h1>
+<p>We saw <code>&amp;&amp;</code> and <code>||</code> applied to pairs of logical values. We can also vectorize these operations.</p>
+<pre class="r"><code>&gt; a &lt;- c(TRUE, TRUE, FALSE)
+&gt; b &lt;- c(FALSE, TRUE, FALSE)
+&gt; 
+&gt; a | b
+[1]  TRUE  TRUE FALSE
+&gt; a &amp; b
+[1] FALSE  TRUE FALSE</code></pre>
 </section></section>
 <section><section id="functions" class="titleslide slide level1"><h1>Functions</h1></section><section id="rationale-1" class="slide level2">
 <h1>Rationale</h1>

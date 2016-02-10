@@ -119,6 +119,9 @@ Data frames are lists where each element has the same length.
 df <- data.frame(counting=1:3, char=c("a", "b", "c"), 
                  logic=c(TRUE, FALSE, TRUE))
 df
+
+nrow(df)
+ncol(df)
 ```
 
 ## Data Frames
@@ -174,6 +177,7 @@ Object | Column Names | Row Names
 -------|--------------|----------
 vector | `names()` | N/A
 data frame | `names()` | `row.names()`
+data frame | `colnames()` | `rownames()`
 matrix | `colnames()` | `rownames()`
 
 # Reproducibility
@@ -732,6 +736,18 @@ x * z
 ```
 
 What happened this time?
+
+## Vectorized Boolean Logic
+
+We saw `&&` and `||` applied to pairs of logical values.  We can also vectorize these operations.
+
+```{r}
+a <- c(TRUE, TRUE, FALSE)
+b <- c(FALSE, TRUE, FALSE)
+
+a | b
+a & b
+```
 
 # Functions
 
