@@ -1,0 +1,879 @@
+---
+title: "SML 201 -- Week 3"
+author: "John D. Storey"
+date: "Spring 2016"
+output:
+  revealjs::revealjs_presentation:
+    center: yes
+    highlight: null
+    theme: simple
+    toc: yes
+    transition: slide
+---
+
+# Functions
+
+## Rationale
+
+<style type="text/css">
+p { 
+  text-align: left; 
+  }
+.reveal pre code { 
+  color: #000000; 
+  background-color: rgb(240,240,240);
+  font-size: 1.15em;
+  border:none; 
+  }
+.reveal section img { 
+  background:none; 
+  border:none; 
+  box-shadow:none; 
+  }
+}
+</style>
+
+```{r my_opts, cache=FALSE, include=FALSE}
+library(knitr)
+opts_chunk$set(fig.align="center", fig.height=5.5, fig.width=6, collapse=TRUE, comment="", prompt=TRUE)
+options(width=63)
+```
+
+- Writing functions is a core activity of an R programmer. It represents the key step of the transition from a mere user to a developer who creates new functionality for R. 
+
+- Functions are often used to encapsulate a sequence of expressions that need to be executed numerous times, perhaps under slightly different conditions. 
+
+- Functions are also often written when code must be shared with others or the public.
+
+From *R Programming for Data Science* 
+
+## Defining a New Function
+
+- Functions are defined using the `function()` directive
+
+- They are stored as variables, so they can be passed to other functions and assigned to new variables
+
+- Arguments and a final return object are defined
+
+## Example 1
+
+```{r}
+my_square <- function(x) {
+  x*x  # can also do return(x*x)
+}
+
+my_square(x=2)
+
+my_fun2 <- my_square
+my_fun2(x=3)
+```
+
+## Example 2
+
+```{r}
+my_square_ext <- function(x) {
+  y <- x*x
+  return(list(x_original=x, x_squared=y))
+}
+
+my_square_ext(x=2)
+
+z <- my_square_ext(x=2)
+```
+
+## Example 3
+
+```{r}
+my_power <- function(x, e, say_hello) {
+  if(say_hello) {
+    cat("Hello World!")
+  }
+  x^e
+}
+
+my_power(x=2, e=3, say_hello=TRUE)
+
+z <- my_power(x=2, e=3, say_hello=TRUE)
+z
+```
+
+
+## Default Function Argument Values
+
+Some functions have default values for their arguments:
+```{r}
+str(matrix)
+```
+
+You can define a function with default values by the following:
+```
+f <- function(x, y=2) {
+  x + y
+}
+```
+If the user types `f(x=1)` then it defaults to `y=2`, but if the user types `f(x=1, y=3)`, then it executes with these assignments.
+
+## The Ellipsis Argument
+
+You will encounter functions that include as a possible argument the ellipsis: `...`
+
+This basically holds arguments that can be passed to functions called within a function.  Example:
+
+```{r}
+double_log <- function(x, ...) {
+  log((2*x), ...)
+}
+
+double_log(x=1, base=2)
+double_log(x=1, base=10)
+```
+
+## Argument Matching
+
+*R Programming for Data Science* spends several pages discussing how R deals with function calls when the arguments are not defined explicity. For example:
+
+```
+x <- matrix(1:6, nrow=2, ncol=3, byrow=TRUE)  # versus
+x <- matrix(1:6, 2, 3, TRUE)
+```
+
+I strongly recommend that you define arguments explcitly. For example, I can never remember which comes first in `matrix()`, `nrow` or `ncol`.
+
+# Organizing Your Code
+
+## Suggestions
+
+RStudio conveniently tries to automatically format your R code.  We suggest the following in general.
+
+1\. No more than 80 characters per line (or fewer depending on how R Markdown compiles): 
+```
+really_long_line <- my_function(x=20, y=30, z=TRUE,
+                                a="Joe", b=3.8)
+```
+
+2\. Indent 2 or more characters for nested commands:
+```
+for(i in 1:10) {
+  if(i > 4) {
+    print(i)
+  }
+}
+```
+
+## Suggestions (cont'd)
+
+3\. Generously comment your code.
+
+```
+# a for-loop that prints the index 
+# whenever it is greater than 4
+for(i in 1:10) {
+  if(i > 4) {
+    print(i)
+  }
+}
+# a good way to get partial credit
+# if something goes wrong :-)
+```
+
+4\. Do not hesitate to write functions to organize tasks.  These help to break up your code into more undertsandable pieces, and functions can often be used several times.
+
+## Where to Put Files
+
+See *Elements of Data Analytic Style*, Chapter 12 ("Reproducibility") for suggestions on how to organize your files.
+
+In this course, we will keep this relatively simple.  We will try to provide you with some organization when distributing the projects.
+
+# Environment
+
+## Loading `.RData` Files
+
+An `.RData` file is a binary file containing R objects.  These can be saved from your current R session and also loaded into your current session.
+
+```{r, include=FALSE, cache=FALSE}
+rm(list=ls())
+load("../data/project_1_R_basics.RData")
+```
+
+```
+> # generally...
+> # to load:
+> load(file="path/to/file_name.RData")
+> # to save:
+> save(file="path/to/file_name.RData")
+```
+
+```{r, eval=FALSE}
+# assumes file in working directory
+load(file="project_1_R_basics.RData") 
+```
+
+```{r, eval=FALSE}
+# loads from our GitHub repository
+load(file=url("https://github.com/SML201/project1/raw/
+         master/project_1_R_basics.RData")) 
+```
+
+## Listing Objects
+
+The objects in your current R session can be listed. An environment can also be specificied in case you have objects stored in different environments.
+
+```{r}
+ls()
+
+ls(name=globalenv())
+
+# see help file for other options
+?ls
+```
+
+
+## Removing Objects
+
+You can remove specific objects or all objects from your R environment of choice.
+
+```{r}
+rm("some_ORFE_profs") # removes variable some_ORFE_profs
+
+rm(list=ls()) # Removes all variables from environment
+```
+
+## Advanced
+
+The R environment is there to connect object names to object values.  
+
+The *R Programming for Data Science* chapter titled "Scoping Rules of R" discussed environments and object names in more detail than we need for this course.  
+
+A useful discussion about environments can also be found on the [*Advanced R*](http://adv-r.had.co.nz/Environments.html) web site.
+
+# Packages
+
+## Rationale
+
+"In R, the fundamental unit of shareable code is the package. A package bundles together code, data, documentation, and tests, and is easy to share with others. As of January 2015, there were over 6,000 packages available on the **C**omprehensive **R** **A**rchive **N**etwork, or [CRAN](https://cran.r-project.org/web/packages/available_packages_by_name.html), the public clearing house for R packages. This huge variety of packages is one of the reasons that R is so successful: the chances are that someone has already solved a problem that you’re working on, and you can benefit from their work by downloading their package."
+
+From <http://r-pkgs.had.co.nz/intro.html> by Hadley Wickham
+
+## Contents of a Package
+
+- R functions
+- R data objects
+- Help documents for using the package
+- Information on the authors, dependencies, etc.
+- Information to make sure it "plays well" with R and other packages
+
+## Installing Packages
+
+From CRAN:
+```
+install.packages("dplyr")
+```
+
+From GitHub (for advanced users):
+```
+library("devtools")
+install_github("hadley/dplyr")
+```
+
+From Bioconductor (basically CRAN for biology):
+```
+source("https://bioconductor.org/biocLite.R")
+biocLite("qvalue")
+```
+
+We will (probably) only be using packages from CRAN.  Be *very* careful about dependencies when installing from GitHub.
+
+## Installing Packages (cont'd)
+
+Multiple packages:
+```
+install.packages(c("dplyr", "ggplot2"))
+```
+
+Install all dependencies:
+```
+install.packages(c("dplyr", "ggplot2"), dependencies=TRUE)
+```
+
+Updating packages:
+```
+update.packages()
+```
+
+## Loading Packages
+
+Two ways to load a package:
+
+```
+library("dplyr")
+library(dplyr)
+```
+
+I prefer the former.
+
+## Getting Started with a Package
+
+When you install a new package and load it, what's next?  I like to look at the help files and see what functions and data sets a package has.
+
+```
+library("dplyr")
+help(package="dplyr")
+```
+
+## Specifying a Function within a Package
+
+You can call a function from a specific package.  Suppose you are in a setting where you have two packages loaded that have functions with the same name.
+
+```
+dplyr::arrange(mtcars, cyl, disp)
+```
+
+This calls the `arrange` functin specifically from `dplyr`.  The package `plyr` also has an `arrange` function.
+
+## More on Packages
+
+We will be covering several highly used R packages in depth this semester, so we will continue to learn about packages, how they are organized, and how they are used.
+
+You can download the "source" of a package from R and take a look at the contents if you want to dig deeper.  There are also many good tutorials on creating packages, such as <http://hilaryparker.com/2014/04/29/writing-an-r-package-from-scratch/>.
+
+
+# Subsetting R Objects
+
+## Subsetting Vectors
+
+```{r}
+x <- 1:8
+
+x[1]           # extract the first element
+x[2]           # extract the second element
+
+x[1:4]         # extract the first 4 elements
+
+x[c(1, 3, 4)]  # extract elements 1, 3, and 4
+x[-c(1, 3, 4)] # extract all elements EXCEPT 1, 3, and 4
+```
+
+## Subsetting Vectors
+
+```{r}
+names(x) <- letters[1:8]
+x
+
+x[c("a", "b", "f")]
+
+s <- x > 3
+s
+x[s]
+```
+
+## Subsettng Matrices
+
+```{r}
+x <- matrix(1:6, nrow=2, ncol=3, byrow=TRUE)
+x
+
+x[1,2]
+x[1, ]
+x[ ,2]
+```
+
+## Subsettng Matrices
+
+```{r}
+colnames(x) <- c("A", "B", "C")
+
+x[ , c("B", "C")]
+
+x[c(FALSE, TRUE), c("B", "C")]
+
+x[2, c("B", "C")]
+```
+
+## Subsettng Matrices
+
+```{r}
+s <- (x %% 2) == 0
+s
+
+x[s]
+
+x[c(2, 3, 6)]
+```
+
+
+## Subsetting Lists
+
+```{r}
+x <- list(my=1:3, favorite=c("a", "b", "c"), 
+          course=c(FALSE, TRUE, NA))
+
+x[[1]]
+x[["my"]]
+x$my
+```
+
+```{r}
+x[[c(3,1)]]
+x[[3]][1]
+```
+
+```{r}
+x[c(3,1)]
+```
+
+## Subsetting Data Frames
+
+```{r}
+x <- data.frame(my=1:3, favorite=c("a", "b", "c"), 
+          course=c(FALSE, TRUE, NA))
+
+x[[1]]
+x[["my"]]
+x$my
+```
+
+```{r}
+x[[c(3,1)]]
+x[[3]][1]
+```
+
+```{r}
+x[c(3,1)]
+```
+
+## Subsetting Data Frames
+
+```{r}
+x <- data.frame(my=1:3, favorite=c("a", "b", "c"), 
+          course=c(FALSE, TRUE, NA))
+
+x[1, ]
+x[ ,3]
+x[ ,"favorite"]
+```
+
+```{r}
+x[1:2, ]
+x[ ,2:3]
+```
+
+## Note on Data Frames
+
+R often converts character strings to factors unless you specify otherwise.  
+
+In the previous slide, we saw it converted the "favorite" column to factors. Let's fix that...
+
+```{r}
+x <- data.frame(my=1:3, favorite=c("a", "b", "c"), 
+                course=c(FALSE, TRUE, NA), 
+                stringsAsFactors=FALSE)
+
+x[ ,"favorite"]
+class(x[ ,"favorite"])
+```
+
+
+## Missing Values
+
+```{r}
+data("airquality", package="datasets")
+head(airquality)
+dim(airquality)
+```
+
+```{r}
+which(is.na(airquality$Ozone))
+sum(is.na(airquality$Ozone))
+```
+
+## Subsetting by Matching
+
+```{r}
+letters
+vowels <- c("a", "e", "i", "o", "u")
+
+letters %in% vowels
+which(letters %in% vowels)
+
+letters[which(letters %in% vowels)]
+```
+
+## Advanced Subsetting 
+
+The *R Programming for Data Science* chapter titled "Subsetting R Objects" contains additional material on subsetting that you should know.
+
+
+The [*Advanced R*](http://adv-r.had.co.nz/Subsetting.html) website contains more detailed information on subsetting that you may find useful.
+
+
+# Tidy Data
+
+## Definition
+
+> Tidy datasets are easy to manipulate, model and visualize, and have a specific structure: each variable is a column, each observation is a row, and each type of observational unit is a table.
+
+From Wickham (2014), "Tidy Data", *Journal of Statistical Software*
+
+## Definition (cont'd)
+
+> A dataset is a collection of values, usually either numbers (if quantitative) or strings (if qualitative). Values are organized in two ways. Every value belongs to a variable and an observation. A variable contains all values that measure the same underlying attribute (like height, temperature, duration) across units. An observation contains all values measured on the same unit (like a person, or a day, or a race) across attributes.
+
+From: Wickham H (2014), "Tidy Data", *Journal of Statistical Software*
+
+## Example: Titanic Data
+
+According to the `Titanic` data from the `datasets` package: 367 males survived, 1364 males perished, 344 females survived, and 126 females perished.
+
+How should we organize these data?
+
+## Intuitive Format
+
+\ | Survived | Perished
+---- | ---- | ----
+**Male** | 367 | 1364
+**Female** | 344 | 126
+
+## Tidy Format
+
+fate | sex | number
+---- | ---- | ----
+perished | male | 1364
+perished | female | 126
+survived | male | 367
+survived | female | 344
+
+## Wide vs. Long Format
+
+Tidy data come in wide and long formats.
+
+Wide format data have a column for each variable and there is one observed unit per row.
+
+The simplest long format data have two columns.  The first column contains the variable names and the second colum contains the values for the variables.  There are "wider" long format data that have additional columns that identify connections between observations.
+
+Wide format data is useful for some analyses and long format for others.
+
+## `reshape2` Package
+
+The `reshape` package has three important functions:  `melt`, `dcast`, and `acast`.  It allows one to move between wide and long tidy data formats.
+
+```{r}
+library("reshape2")
+library("datasets")
+data(airquality, package="datasets")
+names(airquality)
+dim(airquality)
+```
+
+```{r, include=FALSE}
+library("dplyr")
+#names(airquality) <- tolower(names(airquality))
+airquality <- tbl_df(airquality)
+```
+
+## Air Quality Data Set
+
+```{r}
+head(airquality)
+```
+
+```{r}
+tail(airquality)
+```
+
+## Melt
+
+Melting can be thought of as melting a piece of solid metal (wide data), so it drips into long format.
+
+```{r}
+aql <- melt(airquality)
+head(aql)
+```
+
+```{r}
+tail(aql)
+```
+
+## Guided Melt
+
+In the previous example, we lose the fact that a set of measurements occurred on a particular day and month, so we can do a guided melt to keep this information.
+
+```{r}
+aql <- melt(airquality, id.vars = c("Month", "Day"))
+head(aql)
+```
+
+```{r}
+tail(aql)
+```
+
+## Casting
+
+Casting allows us to go from long format to wide format data.  It can be visualized as pouring molten metal (long format) into a cast to create a solid piece of metal (wide format).
+
+Casting is more difficult because choices have to be made to determine how the wide format will be organized.  It often takes some thought and experimentation for new users. 
+
+Let's do an example with `dcast`, which is casting for data frames.
+
+## `dcast`
+
+```{r}
+aqw <- dcast(aql, Month + Day ~ variable)
+head(aqw)
+```
+
+```{r}
+tail(aqw)
+```
+
+
+# Manipulating Data Frames
+
+## `dplyr` Package
+
+`dplyr` is a package with the following description:
+
+> A fast, consistent tool for working with data frame like objects, both in memory and out of memory.
+
+This package offers a "grammar" for manipulating data frames.  
+
+Everything that `dplyr` does can also be done using basic R commands -- however, it tends to be much faster and easier to use `dplyr`.
+
+## Grammar of `dplyr`
+
+Verbs:
+
+- `filter`: extract a subset of rows from a data frame based on logical conditions
+- `arrange`: reorder rows of a data frame
+- `rename`: rename variables in a data frame
+- `select`: return a subset of the columns of a data frame, using a flexible notation
+
+Partially based on *R Programming for Data Science* 
+
+
+## Grammar of `dplyr`
+
+Verbs (continued):
+
+- `mutate`: add new variables/columns or transform existing variables
+- `distinct`: returns only the unique values in a table
+- `summarize`: generate summary statistics of different variables in the data frame, possibly within strata
+- `group_by`: breaks down a dataset into specified groups of rows
+
+Partially based on *R Programming for Data Science* 
+
+## Example: Baby Names
+
+```{r, include=FALSE}
+rm(list=ls())
+```
+
+```{r}
+library("dplyr", verbose=FALSE)
+library("babynames")
+ls()
+babynames <- babynames::babynames
+ls()
+```
+
+## `babynames` Object
+
+```{r}
+class(babynames)
+dim(babynames)
+```
+
+```{r}
+babynames
+```
+
+## Peak at the Data
+
+```{r}
+set.seed(201)
+sample_n(babynames, 10) 
+# try also sample_frac(babynames, 6e-6)
+```
+
+## `%>%` Operator
+
+Originally from R package `magrittr`.  Provides a mechanism for chaining commands with a forward-pipe operator, `%>%`.
+
+```{r}
+x <- 1:10
+
+x %>% log(base=10) %>% sum
+
+sum(log(x,base=10))
+```
+
+```{r}
+babynames %>% sample_n(5)
+```
+
+## `filter()`
+
+```{r}
+filter(babynames, year==1880, sex=="F")
+# same as filter(babynames, year==1880 & sex=="F")
+```
+
+```{r}
+filter(babynames, year==1880, sex=="F", n > 5000)
+```
+
+## `arrange()`
+
+```{r}
+arrange(babynames, name, year, sex)
+```
+
+## `arrange()`
+
+```{r}
+arrange(babynames, desc(name), desc(year), sex)
+```
+
+## `rename()`
+
+```{r}
+rename(babynames, number=n)
+```
+
+## `select()`
+
+```{r}
+select(babynames, sex, name, n)
+# same as select(babynames, sex:n)
+```
+
+## Renaming with `select()`
+```{r}
+select(babynames, sex, name, number=n)
+```
+
+## `mutate()`
+
+```{r}
+mutate(babynames, total_by_year=round(n/prop))
+# see also transmutate
+```
+
+## No. Individuals by Year and Sex
+
+Let's put a few things together now adding the function `distinct()`...
+
+```{r}
+babynames %>% mutate(total_by_year=round(n/prop)) %>% 
+  select(sex, year, total_by_year) %>% distinct
+```
+
+## `summarize()`
+
+```{r}
+summarize(babynames, mean_n = mean(n), median_n = median(n), 
+          number_sex = n_distinct(sex), 
+          distinct_names = n_distinct(name))
+```
+
+## `group_by()`
+
+```{r}
+babynames %>% group_by(year, sex)
+```
+
+## No. Individuals by Year and Sex
+
+```{r}
+babynames %>% group_by(year, sex) %>% 
+  summarize(total_by_year=sum(n))
+```
+
+Compare to earlier slide. Why the difference?
+
+## How Many Distinct Names?
+
+```{r}
+babynames %>% group_by(sex) %>% 
+  summarize(mean_n = mean(n), 
+            distinct_names_sex = n_distinct(name))
+```
+
+
+## Most Popular Names
+
+```{r}
+top_names <- babynames %>% group_by(year, sex) %>% 
+  summarize(top_name = name[which.max(n)])
+
+head(top_names)
+```
+
+
+## Most Popular Names
+### Recent Years
+
+```{r}
+tail(top_names, n=10)
+```
+
+## Most Popular Female Names 
+### 1990s
+
+```{r}
+top_names %>% filter(year >= 1990 & year < 2000, sex=="F")
+```
+
+## Most Popular Male Names 
+### 1990s
+
+```{r}
+top_names %>% filter(year >= 1990 & year < 2000, sex=="M")
+```
+
+## Analyzing "John"
+
+```{r}
+john <- babynames %>% filter(sex=="M", name=="John") 
+plot(john$year, john$prop, type="l")
+```
+
+## Analyzing "Bella"
+
+```{r}
+bella <- babynames %>% filter(sex=="F", name=="Bella") 
+plot(bella$year, bella$prop, type="l")
+```
+
+## Additional Examples
+
+You should study additional tutorials of `dplyr` that utilize other data sets:
+
+- Read the `dplyr` [introductory vignette](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html)
+- Read the examples given in *R Programming for Data Science*, the "Managing Data Frames with the `dplyr` Package" chapter
+
+## Additional `dplyr` Features
+
+- We've only scratched the surface -- many interesting demos of `dplyr` can be found online
+- `dplyr` can work with other data frame backends such as SQL databases
+- There is an SQL interface for relational databases via the `DBI` package
+- `dplyr` can be integrated with the `data.table` package for large fast tables
+- There is a [healthy rivalry](http://stackoverflow.com/questions/21435339/data-table-vs-dplyr-can-one-do-something-well-the-other-cant-or-does-poorly) between `dplyr` and `data.table`
+
+# Extras
+
+## License
+
+<https://github.com/SML201/lectures/blob/master/LICENSE.md>
+
+
+## Source Code
+
+<https://github.com/SML201/lectures/tree/master/week3>
+
+## Session Information
+
+<section style="font-size: 0.75em;">
+```{r}
+sessionInfo()
+```
+</section>
