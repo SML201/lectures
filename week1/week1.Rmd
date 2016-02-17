@@ -11,6 +11,8 @@ output:
     toc: true
 ---
 
+# {data-background="../images/howto.jpg"}
+
 # Origins of Data Science
 
 ## Statistics and Machine Learning
@@ -460,5 +462,27 @@ x
 x$char
 x$logic[2]
 ```
+
+# Extras
+
+----
+
+<h1>License</h1> 
+
+<https://github.com/SML201/lectures/blob/master/LICENSE.md>
+
+<h1>Source Code</h1>
+
+<https://github.com/SML201/lectures/tree/master/week1>
+
+## Session Information
+
+<section style="font-size: 0.75em;">
+```{r}
+sessionInfo()
+```
+</section>
+
+
 
 

@@ -11,6 +11,8 @@ output:
     toc: true
 ---
 
+# {data-background="../images/howto.jpg"}
+
 # Getting Started in R
 
 ## Summary from Week 1
@@ -987,3 +989,25 @@ This calls the `arrange` functin specifically from `dplyr`.  The package `plyr` 
 We will be covering several highly used R packages in depth this semester, so we will continue to learn about packages, how they are organized, and how they are used.
 
 You can download the "source" of a package from R and take a look at the contents if you want to dig deeper.  There are also many good tutorials on creating packages, such as <http://hilaryparker.com/2014/04/29/writing-an-r-package-from-scratch/>.
+
+# Extras
+
+----
+
+<h1>License</h1> 
+
+<https://github.com/SML201/lectures/blob/master/LICENSE.md>
+
+<h1>Source Code</h1>
+
+<https://github.com/SML201/lectures/tree/master/week2>
+
+## Session Information
+
+<section style="font-size: 0.75em;">
+```{r}
+sessionInfo()
+```
+</section>
+
+
