@@ -3,15 +3,12 @@ title: "SML 201 -- Week 3"
 author: "John D. Storey"
 date: "Spring 2016"
 output:
-  revealjs::revealjs_presentation:
-    center: yes
-    highlight: null
-    theme: simple
-    toc: yes
-    transition: slide
+  pdf_document:
+    toc: true
+    toc_depth: 1
+    keep_tex: true
+geometry: right=2.5in
 ---
-
-# {data-background="../images/howto.jpg"}
 
 # Functions 
 
