@@ -11,9 +11,11 @@ output:
     transition: slide
 ---
 
-# Functions
+# {data-background="../images/howto.jpg"}
 
-## Rationale
+# Functions 
+
+## Rationale 
 
 <style type="text/css">
 p { 
@@ -35,8 +37,11 @@ p {
 
 ```{r my_opts, cache=FALSE, include=FALSE}
 library(knitr)
-opts_chunk$set(fig.align="center", fig.height=5.5, fig.width=6, collapse=TRUE, comment="", prompt=TRUE)
+opts_chunk$set(fig.align="center", fig.height=6, fig.width=7.5, collapse=TRUE, comment="", prompt=TRUE)
 options(width=63)
+knit_hooks$set(small.mar = function(before, options, envir) {
+    if (before) par(mar = c(4, 4, .1, .1))  # smaller margin on top and right
+})
 ```
 
 - Writing functions is a core activity of an R programmer. It represents the key step of the transition from a mere user to a developer who creates new functionality for R. 
@@ -686,7 +691,7 @@ dim(babynames)
 babynames
 ```
 
-## Peak at the Data
+## Peek at the Data
 
 ```{r}
 set.seed(201)
@@ -830,16 +835,17 @@ top_names %>% filter(year >= 1990 & year < 2000, sex=="F")
 top_names %>% filter(year >= 1990 & year < 2000, sex=="M")
 ```
 
-## Analyzing "John"
-
-```{r}
-john <- babynames %>% filter(sex=="M", name=="John") 
+----
+```{r, small.mar=TRUE}
+# Analyzing the name 'John'
+john <- babynames %>% filter(sex=="M", name=="John")
 plot(john$year, john$prop, type="l")
 ```
 
-## Analyzing "Bella"
 
-```{r}
+----
+```{r, small.mar=TRUE}
+# Analyzing the name 'Bella'
 bella <- babynames %>% filter(sex=="F", name=="Bella") 
 plot(bella$year, bella$prop, type="l")
 ```
@@ -857,16 +863,17 @@ You should study additional tutorials of `dplyr` that utilize other data sets:
 - `dplyr` can work with other data frame backends such as SQL databases
 - There is an SQL interface for relational databases via the `DBI` package
 - `dplyr` can be integrated with the `data.table` package for large fast tables
-- There is a [healthy rivalry](http://stackoverflow.com/questions/21435339/data-table-vs-dplyr-can-one-do-something-well-the-other-cant-or-does-poorly) between `dplyr` and `data.table`
+- There is a [healthy rivalry](http://stackoverflow.com/questions/21435339/data-table-vs-dplyr-can-one-do-something-well-the-other-cant-or-does-poorly) between `dplyr` and [`data.table`](https://cran.r-project.org/web/packages/data.table/index.html)
 
 # Extras
 
-## License
+----
+
+<h1>License</h1> 
 
 <https://github.com/SML201/lectures/blob/master/LICENSE.md>
 
-
-## Source Code
+<h1>Source Code</h1>
 
 <https://github.com/SML201/lectures/tree/master/week3>
 

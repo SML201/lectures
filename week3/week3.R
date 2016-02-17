@@ -1,7 +1,10 @@
 ## ----my_opts, cache=FALSE, include=FALSE---------------------------------
 library(knitr)
-opts_chunk$set(fig.align="center", fig.height=5.5, fig.width=6, collapse=TRUE, comment="", prompt=TRUE)
+opts_chunk$set(fig.align="center", fig.height=6, fig.width=7.5, collapse=TRUE, comment="", prompt=TRUE)
 options(width=63)
+knit_hooks$set(small.mar = function(before, options, envir) {
+    if (before) par(mar = c(4, 4, .1, .1))  # smaller margin on top and right
+})
 
 ## ------------------------------------------------------------------------
 my_square <- function(x) {
@@ -321,11 +324,13 @@ top_names %>% filter(year >= 1990 & year < 2000, sex=="F")
 ## ------------------------------------------------------------------------
 top_names %>% filter(year >= 1990 & year < 2000, sex=="M")
 
-## ------------------------------------------------------------------------
-john <- babynames %>% filter(sex=="M", name=="John") 
+## ---- small.mar=TRUE-----------------------------------------------------
+# Analyzing the name 'John'
+john <- babynames %>% filter(sex=="M", name=="John")
 plot(john$year, john$prop, type="l")
 
-## ------------------------------------------------------------------------
+## ---- small.mar=TRUE-----------------------------------------------------
+# Analyzing the name 'Bella'
 bella <- babynames %>% filter(sex=="F", name=="Bella") 
 plot(bella$year, bella$prop, type="l")
 
