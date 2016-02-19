@@ -917,7 +917,7 @@ Source: local data frame [1,792,091 x 6]
 <h1>No. Individuals by Year and Sex</h1>
 <p>Let’s put a few things together now adding the function <code>distinct()</code>…</p>
 <pre class="r"><code>&gt; babynames %&gt;% mutate(total_by_year=round(n/prop)) %&gt;% 
-+   select(sex, year, total_by_year) %&gt;% distinct
++   select(sex, year, total_by_year) %&gt;% distinct()
 Source: local data frame [268 x 3]
 
      sex  year total_by_year
@@ -1133,7 +1133,7 @@ loaded via a namespace (and not attached):
 [10] evaluate_0.8    highr_0.5.1     stringi_1.0-1  
 [13] lazyeval_0.1.10 rmarkdown_0.9.2 tools_3.2.3    
 [16] stringr_1.0.0   parallel_3.2.3  yaml_2.1.13    
-[19] memoise_0.2.1   htmltools_0.3  </code></pre>
+[19] memoise_1.0.0   htmltools_0.3  </code></pre>
 </section>
 </section></section>
     </div>

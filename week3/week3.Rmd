@@ -769,7 +769,7 @@ Let's put a few things together now adding the function `distinct()`...
 
 ```{r}
 babynames %>% mutate(total_by_year=round(n/prop)) %>% 
-  select(sex, year, total_by_year) %>% distinct
+  select(sex, year, total_by_year) %>% distinct()
 ```
 
 ## `summarize()`

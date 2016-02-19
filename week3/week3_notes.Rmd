@@ -5,7 +5,7 @@ date: "Spring 2016"
 output:
   pdf_document:
     toc: true
-    toc_depth: 1
+    toc_depth: 2
     keep_tex: true
 geometry: right=2.5in
 ---
@@ -766,7 +766,7 @@ Let's put a few things together now adding the function `distinct()`...
 
 ```{r}
 babynames %>% mutate(total_by_year=round(n/prop)) %>% 
-  select(sex, year, total_by_year) %>% distinct
+  select(sex, year, total_by_year) %>% distinct()
 ```
 
 ## `summarize()`
@@ -832,7 +832,6 @@ top_names %>% filter(year >= 1990 & year < 2000, sex=="F")
 top_names %>% filter(year >= 1990 & year < 2000, sex=="M")
 ```
 
-----
 ```{r, small.mar=TRUE}
 # Analyzing the name 'John'
 john <- babynames %>% filter(sex=="M", name=="John")
@@ -840,7 +839,6 @@ plot(john$year, john$prop, type="l")
 ```
 
 
-----
 ```{r, small.mar=TRUE}
 # Analyzing the name 'Bella'
 bella <- babynames %>% filter(sex=="F", name=="Bella") 
@@ -864,13 +862,11 @@ You should study additional tutorials of `dplyr` that utilize other data sets:
 
 # Extras
 
-----
-
-<h1>License</h1> 
+## License
 
 <https://github.com/SML201/lectures/blob/master/LICENSE.md>
 
-<h1>Source Code</h1>
+## Source Code
 
 <https://github.com/SML201/lectures/tree/master/week3>
 

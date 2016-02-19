@@ -290,7 +290,7 @@ mutate(babynames, total_by_year=round(n/prop))
 
 ## ------------------------------------------------------------------------
 babynames %>% mutate(total_by_year=round(n/prop)) %>% 
-  select(sex, year, total_by_year) %>% distinct
+  select(sex, year, total_by_year) %>% distinct()
 
 ## ------------------------------------------------------------------------
 summarize(babynames, mean_n = mean(n), median_n = median(n), 
