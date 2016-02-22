@@ -9,9 +9,17 @@ output:
     center: true
     highlight: null
     toc: true
+    includes:
+      before_body: ../customization/doc_prefix.html
 ---
 
-# {data-background="../images/howto.jpg"}
+```{r my_opts, cache=FALSE, echo=FALSE}
+library(knitr)
+opts_chunk$set(fig.align="center", fig.height=5.5, fig.width=6, collapse=TRUE, comment="", prompt=TRUE)
+options(width=63)
+```
+
+# <img src="../images/howto.jpg"></img>
 
 # Getting Started in R
 
@@ -29,21 +37,7 @@ Last week we learned about R:
 
 
 ## Missing Values
-<style type="text/css">
-p { 
-  text-align: left; 
-  }
-.reveal pre code { 
-  color: #000000; 
-  background-color: rgb(240,240,240);
-  font-size: 1.15em;
-  }
-</style>
 
-```{r my_opts, cache=FALSE, echo=FALSE}
-library(knitr)
-opts_chunk$set(fig.align="center", fig.height=5.5, fig.width=6, collapse=TRUE, comment="", prompt=TRUE)
-```
 In data analysis and model fitting, we often have missing values.  `NA` represents missing values and `NaN` means "not a number", which is a special type of missing value.
 
 ```{r}
@@ -327,9 +321,12 @@ Florence Nightingale once said:
 
 Plain code blocks:  
 
-<pre><code>```
-This text is displayed verbatim with no formatting.
-```</code></pre>
+```{r, echo=FALSE}
+cat(c("```",
+      "This text is displayed verbatim with no formatting.",
+      "```"), 
+    sep='\n')
+```
 
 Inline Code:
 ```
@@ -345,7 +342,9 @@ The `knitr` R package allows one to execute R code within a document, and to dis
 
 *Placing the following text in an R Markdown file*
 
-<code>The sum of 2 and 2 is &#96;r 2+2&#96;.</code>
+```{r echo=FALSE}
+cat("The sum of 2 and 2 is `r 2+2`.")
+```
 
 *produces in the output file*  
 
@@ -355,12 +354,14 @@ The sum of 2 and 2 is `r 2+2`.
 
 Chunks of R code separated from the text.  In R Markdown:
 
-<pre><code>```{r}
-x <- 2
-x + 1
-print(x)
+```{r, echo=FALSE}
+cat(c("```{r}",
+      "x <- 2",
+      "x + 1",
+      "print(x)",
+      "```"), 
+    sep='\n')
 ```
-</code></pre>
 
 Output in file:
 ```{r}
@@ -373,12 +374,14 @@ print(x)
 
 In R Markdown:
 
-<pre><code>```{r, echo=FALSE}
-x <- 2
-x + 1
-print(x)
+```{r, echo=FALSE}
+cat(c("```{r, echo=FALSE}",
+      "x <- 2",
+      "x + 1",
+      "print(x)",
+      "```"), 
+    sep='\n')
 ```
-</code></pre>
 
 Output in file:
 ```{r, echo=FALSE}
@@ -391,12 +394,14 @@ print(x)
 
 In R Markdown:
 
-<pre><code>```{r, results="hide"}
-x <- 2
-x + 1
-print(x)
+```{r, echo=FALSE}
+cat(c("```{r, results=\"hide\"}",
+      "x <- 2",
+      "x + 1",
+      "print(x)",
+      "```"), 
+    sep='\n')
 ```
-</code></pre>
 
 Output in file:
 ```{r, results="hide"}
@@ -409,12 +414,14 @@ print(x)
 
 In R Markdown:
 
-<pre><code>```{r, include=FALSE}
-x <- 2
-x + 1
-print(x)
+```{r, echo=FALSE}
+cat(c("```{r, include=FALSE}",
+      "x <- 2",
+      "x + 1",
+      "print(x)",
+      "```"), 
+    sep='\n')
 ```
-</code></pre>
 
 Output in file:
 ```{r, include=FALSE}
@@ -428,12 +435,14 @@ print(x)
 
 In R Markdown:
 
-<pre><code>```{r, eval=FALSE}
-x <- 2
-x + 1
-print(x)
+```{r, echo=FALSE}
+cat(c("```{r, eval=FALSE}",
+      "x <- 2",
+      "x + 1",
+      "print(x)",
+      "```"), 
+    sep='\n')
 ```
-</code></pre>
 
 Output in file:
 ```{r, eval=FALSE}
@@ -446,28 +455,33 @@ print(x)
 
 Naming your chunks can be useful for identifying them in your file and during the execution, and also to denote dependencies among chunks.
 
-<pre><code>```{r my_first_chunk}
-x <- 2
-x + 1
-print(x)
+```{r, echo=FALSE}
+cat(c("```{r my_first_chunk}",
+      "x <- 2",
+      "x + 1",
+      "print(x)",
+      "```"), 
+    sep='\n')
 ```
-</code></pre>
-
 
 ## knitr Option: `cache`
 
 Sometimes you don't want to run chunks over and over, especially for large calculations.  You can "cache" them.
 
-<pre><code>```{r chunk1, cache=TRUE, include=FALSE}
-x <- 2
+```{r, echo=FALSE}
+cat(c("```{r chunk1, cache=TRUE, include=FALSE}",
+      "x <- 2",
+      "```"), 
+    sep='\n')
 ```
-</code></pre>
 
-<pre><code>```{r chunk2, cache=TRUE, dependson='chunk1'}
-y <- 3
-z <- x + y
+```{r, echo=FALSE}
+cat(c("```{r chunk2, cache=TRUE, dependson=\"chunk1\"}",
+      "y <- 3",
+      "z <- x + y",
+      "```"), 
+    sep='\n')
 ```
-</code></pre>
 
 This creates a directory called `cache` in your working directory that stores the objects created or modified in these chunks. When `chunk1` is modified, it is re-run.  Since `chunk2` depends on `chunk1`, it will also be re-run.
 
@@ -483,12 +497,13 @@ You can add chunk options regarding the placement and size of figures.  Examples
 
 If you will be using the same options on most chunks, you can set default options for the entire document.  Run something like this at the beginning of your document with your desired chunk options.
  
-<pre><code>```{r my_opts, cache=FALSE, echo=FALSE}
-library(knitr)
-opts_chunk$set(fig.align="center", fig.height=4, fig.width=6)
+```{r, echo=FALSE}
+cat(c("```{r my_opts, cache=FALSE, echo=FALSE}",
+      "library(\"knitr\")",
+      "opts_chunk$set(fig.align=\"center\", fig.height=4, fig.width=6)",
+      "```"), 
+    sep='\n')
 ```
-</code></pre>
-
 
 ## Documentation and Examples
 
@@ -751,254 +766,15 @@ a | b
 a & b
 ```
 
-# Functions
-
-## Rationale
-
-- Writing functions is a core activity of an R programmer. It represents the key step of the transition from a mere user to a developer who creates new functionality for R. 
-
-- Functions are often used to encapsulate a sequence of expressions that need to be executed numerous times, perhaps under slightly different conditions. 
-
-- Functions are also often written when code must be shared with others or the public.
-
-From *R Programming for Data Science* 
-
-## Defining a New Function
-
-- Functions are defined using the `function()` directive
-
-- They are stored as variables, so they can be passed to other functions and assigned to new variables
-
-- Arguments and a final return object are defined
-
-## Example 1
-
-```{r}
-my_square <- function(x) {
-  x*x  # can also do return(x*x)
-}
-
-my_square(x=2)
-
-my_fun2 <- my_square
-my_fun2(x=3)
-```
-
-## Example 2
-
-```{r}
-my_square_ext <- function(x) {
-  y <- x*x
-  return(list(x_original=x, x_squared=y))
-}
-
-my_square_ext(2)
-
-z <- my_square_ext(2)
-```
-
-## Example 3
-
-```{r}
-my_power <- function(x, e, say_hello) {
-  if(say_hello) {
-    cat("Hello World!")
-  }
-  x^e
-}
-
-my_power(x=2, e=3, say_hello=TRUE)
-
-z <- my_power(x=2, e=3, say_hello=TRUE)
-z
-```
-
-
-## Default Function Argument Values
-
-Some functions have default values for their arguments:
-```{r}
-str(matrix)
-```
-
-You can define a function with default values by the following:
-```
-f <- function(x, y=2) {
-  x + y
-}
-```
-If the user types `f(x=1)` then it defaults to `y=2`, but if the user types `f(x=1, y=3)`, then it executes with these assignments.
-
-## The Ellipsis Argument
-
-You will encounter functions that include as a possible argument the ellipsis: `...`
-
-This basically holds arguments that can be passed to functions called within a function.  Example:
-
-```{r}
-double_log <- function(x, ...) {
-  log((2*x), ...)
-}
-
-double_log(1, base=2)
-double_log(1, base=10)
-```
-
-## Argument Matching
-
-*R Programming for Data Science* spends several pages discussing how R deals with function calls when the arguments are not defined explicity. For example:
-
-```
-x <- matrix(1:6, nrow=2, ncol=3, byrow=TRUE)  # versus
-x <- matrix(1:6, 2, 3, TRUE)
-```
-
-I strongly recommend that you define arguments explcitly. For example, I can never remember which comes first in `matrix()`, `nrow` or `ncol`.
-
-# Organizing Your Code
-
-## Suggestions
-
-Rstudio conveniently tries to automatically format your R code.  We suggest the following in general.
-
-1\. No more than 80 characters per line (or fewer depending on how R Markdown compiles): 
-```
-really_long_line <- my_function(x=20, y=30, z=TRUE,
-                                a="Joe", b=3.8)
-```
-
-2\. Indent 2 or more characters for nested commands:
-```
-for(i in 1:10) {
-  if(i > 4) {
-    print(i)
-  }
-}
-```
-
-## Suggestions (cont'd)
-
-3\. Generously comment your code.
-
-```
-# a for-loop that prints the index 
-# whenever it is greater than 4
-for(i in 1:10) {
-  if(i > 4) {
-    print(i)
-  }
-}
-# a good way to get partial credit
-# if something goes wrong :-)
-```
-
-4\. Do not hesitate to write functions to organize tasks.  These help to break up your code into more undertsandable pieces, and functions can often be used several times.
-
-## Where to Put Files
-
-See *Elements of Data Analytic Style*, Chapter 12 ("Reproducibility") for suggestions on how to organize your files.
-
-In this course, we will keep this relatively simple.  We will try to provide you with some organization when distributing the projects.
-
-# Packages
-
-## Rationale
-
-"In R, the fundamental unit of shareable code is the package. A package bundles together code, data, documentation, and tests, and is easy to share with others. As of January 2015, there were over 6,000 packages available on the **C**omprehensive **R** **A**rchive **N**etwork, or [CRAN](https://cran.r-project.org/web/packages/available_packages_by_name.html), the public clearing house for R packages. This huge variety of packages is one of the reasons that R is so successful: the chances are that someone has already solved a problem that you’re working on, and you can benefit from their work by downloading their package."
-
-From <http://r-pkgs.had.co.nz/intro.html> by Hadley Wickham
-
-## Contents of a Package
-
-- R functions
-- R data objects
-- Help documents for using the package
-- Information on the authors, dependencies, etc.
-- Information to make sure it "plays well" with R and other packages
-
-## Installing Packages
-
-From CRAN:
-```
-install.packages("dplyr")
-```
-
-From GitHub (for advanced users):
-```
-library("devtools")
-install_github("hadley/dplyr")
-```
-
-From Bioconductor (basically CRAN for biology):
-```
-source("https://bioconductor.org/biocLite.R")
-biocLite("qvalue")
-```
-
-We will (probably) only be using packages from CRAN.  Be *very* careful about dependencies when installing from GitHub.
-
-## Installing Packages (cont'd)
-
-Multiple packages:
-```
-install.packages(c("dplyr", "ggplot2"))
-```
-
-Dependencies:
-```
-install.packages(c("dplyr", "ggplot2"), dependencies=TRUE)
-```
-
-Updating packages:
-```
-update.packages()
-```
-
-## Loading Packages
-
-Two ways to load a package:
-
-```
-library("dplyr")
-library(dplyr)
-```
-
-I prefer the former.
-
-## Getting Started with a Package
-
-When you install a new package and load it, what's next?  I like to look at the help files and see what functions and data sets a package has.
-
-```
-library("dplyr")
-help(package="dplyr")
-```
-
-## Specifying a Function within a Package
-
-You can call a function from a specific package.  Suppose you are in a setting where you have two packages loaded that have functions with the same name.
-
-```
-dplyr::arrange(mtcars, cyl, disp)
-```
-
-This calls the `arrange` functin specifically from `dplyr`.  The package `plyr` also has an `arrange` function.
-
-## More on Packages
-
-We will be covering several highly used R packages in depth this semester, so we will continue to learn about packages, how they are organized, and how they are used.
-
-You can download the "source" of a package from R and take a look at the contents if you want to dig deeper.  There are also many good tutorials on creating packages, such as <http://hilaryparker.com/2014/04/29/writing-an-r-package-from-scratch/>.
 
 # Extras
 
-----
-
-<h1>License</h1> 
+## License
 
 <https://github.com/SML201/lectures/blob/master/LICENSE.md>
 
-<h1>Source Code</h1>
+
+## Source Code
 
 <https://github.com/SML201/lectures/tree/master/week2>
 
@@ -1010,4 +786,7 @@ sessionInfo()
 ```
 </section>
 
+```{r converttonotes, include=FALSE, cache=FALSE}
+source("../customization/make_notes.R")
+```
 

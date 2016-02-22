@@ -8,30 +8,21 @@ output:
     transition: slide
     center: true
     highlight: null
-    toc: true
+    includes:
+      before_body: ../customization/doc_prefix.html
 ---
-
-# {data-background="../images/howto.jpg"}
-
-# Origins of Data Science
-
-## Statistics and Machine Learning
-
-<style type="text/css">
-p { 
-  text-align: left; 
-  }
-.reveal pre code { 
-  color: #000000; 
-  background-color: rgb(240,240,240);
-  font-size: 1.15em;
-  }
-</style>
 
 ```{r cache=FALSE, echo=FALSE}
 library(knitr)
 opts_chunk$set(fig.align="center", fig.height=5.5, fig.width=6, collapse=TRUE, comment="", prompt=TRUE)
+options(width=63)
 ```
+
+# <img src="../images/howto.jpg"></img>
+
+# Origins of Data Science
+
+## Statistics and Machine Learning
 
 **Statistics** is the study of the collection, analysis, interpretation, presentation, and organization of data.
 
@@ -230,13 +221,13 @@ From *The Art of Data Science*.
 
 ------
 
-<center><img src="./images/epicycles.jpg" width="400px" /></center>
+<center>![Epicycles](./images/epicycles.jpg)</center>
 
 From *The Art of Data Science*.
 
 ------
 
-<center><img src="./images/data_question_flowchart.jpg" width="500px" /></center>
+<center>![Data_Flowchart](./images/data_question_flowchart.jpg)</center>
 
 From *Elements of Data Analytic Style*.
 
@@ -465,13 +456,12 @@ x$logic[2]
 
 # Extras
 
-----
-
-<h1>License</h1> 
+## License
 
 <https://github.com/SML201/lectures/blob/master/LICENSE.md>
 
-<h1>Source Code</h1>
+
+## Source Code
 
 <https://github.com/SML201/lectures/tree/master/week1>
 
@@ -483,6 +473,6 @@ sessionInfo()
 ```
 </section>
 
-
-
-
+```{r converttonotes, include=FALSE, cache=FALSE}
+source("../customization/make_notes.R")
+```

@@ -10,28 +10,6 @@ output:
 geometry: right=2.5in
 ---
 
-# Functions 
-
-## Rationale 
-
-<style type="text/css">
-p { 
-  text-align: left; 
-  }
-.reveal pre code { 
-  color: #000000; 
-  background-color: rgb(240,240,240);
-  font-size: 1.15em;
-  border:none; 
-  }
-.reveal section img { 
-  background:none; 
-  border:none; 
-  box-shadow:none; 
-  }
-}
-</style>
-
 ```{r my_opts, cache=FALSE, include=FALSE}
 library(knitr)
 opts_chunk$set(fig.align="center", fig.height=6, fig.width=7.5, collapse=TRUE, comment="", prompt=TRUE)
@@ -40,6 +18,11 @@ knit_hooks$set(small.mar = function(before, options, envir) {
     if (before) par(mar = c(4, 4, .1, .1))  # smaller margin on top and right
 })
 ```
+
+
+# Functions 
+
+## Rationale 
 
 - Writing functions is a core activity of an R programmer. It represents the key step of the transition from a mere user to a developer who creates new functionality for R. 
 
@@ -877,3 +860,4 @@ You should study additional tutorials of `dplyr` that utilize other data sets:
 sessionInfo()
 ```
 </section>
+

@@ -10,26 +10,16 @@ output:
 geometry: right=2.5in
 ---
 
-# Origins of Data Science
-
-## Statistics and Machine Learning
-
-<style type="text/css">
-p { 
-  text-align: left; 
-  }
-.reveal pre code { 
-  color: #000000; 
-  background-color: rgb(240,240,240);
-  font-size: 1.15em;
-  }
-</style>
-
 ```{r cache=FALSE, echo=FALSE}
 library(knitr)
 opts_chunk$set(fig.align="center", fig.height=5.5, fig.width=6, collapse=TRUE, comment="", prompt=TRUE)
 options(width=63)
 ```
+
+
+# Origins of Data Science
+
+## Statistics and Machine Learning
 
 **Statistics** is the study of the collection, analysis, interpretation, presentation, and organization of data.
 
@@ -135,9 +125,11 @@ I think there are three main steps in a data science project: you collect data (
 
 <http://simplystatistics.org/2013/12/12/the-key-word-in-data-science-is-not-data-it-is-science/>
 
+
 <center>![DS Venn Diagram](./images/Data_Science_VD.png)</center>
 
 <http://drewconway.com/zia/2013/3/26/the-data-science-venn-diagram>
+
 
 <center>![Storey Lab](./images/storey_lab.jpeg)</center>
 
@@ -222,11 +214,13 @@ I think there are three main steps in a data science project: you collect data (
 
 From *The Art of Data Science*.
 
+
 <center>![Epicycles](./images/epicycles.jpg)</center>
 
 From *The Art of Data Science*.
 
-<center>![Data Analysis Flowchart](./images/data_question_flowchart.jpg)</center>
+
+<center>![Data_Flowchart](./images/data_question_flowchart.jpg)</center>
 
 From *Elements of Data Analytic Style*.
 

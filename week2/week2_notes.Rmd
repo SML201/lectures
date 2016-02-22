@@ -10,6 +10,13 @@ output:
 geometry: right=2.5in
 ---
 
+```{r my_opts, cache=FALSE, echo=FALSE}
+library(knitr)
+opts_chunk$set(fig.align="center", fig.height=5.5, fig.width=6, collapse=TRUE, comment="", prompt=TRUE)
+options(width=63)
+```
+
+
 # Getting Started in R
 
 ## Summary from Week 1
@@ -26,22 +33,7 @@ Last week we learned about R:
 
 
 ## Missing Values
-<style type="text/css">
-p { 
-  text-align: left; 
-  }
-.reveal pre code { 
-  color: #000000; 
-  background-color: rgb(240,240,240);
-  font-size: 1.15em;
-  }
-</style>
 
-```{r my_opts, cache=FALSE, echo=FALSE}
-library(knitr)
-opts_chunk$set(fig.align="center", fig.height=5.5, fig.width=6, collapse=TRUE, comment="", prompt=TRUE)
-options(width=63)
-```
 In data analysis and model fitting, we often have missing values.  `NA` represents missing values and `NaN` means "not a number", which is a special type of missing value.
 
 ```{r}
@@ -256,7 +248,12 @@ R Markdown documents begin with a metadata section, the YAML header, that can in
 title: "SML 201 -- Project 1"
 author: "Your Name"
 date: February 8, 2016
-output: pdf_document
+output:
+  pdf_document:
+    toc: true
+    toc_depth: 2
+    keep_tex: true
+geometry: right=2.5in
 ---
 ```
 
@@ -325,9 +322,12 @@ Florence Nightingale once said:
 
 Plain code blocks:  
 
-<pre><code>```
-This text is displayed verbatim with no formatting.
-```</code></pre>
+```{r, echo=FALSE}
+cat(c("```",
+      "This text is displayed verbatim with no formatting.",
+      "```"), 
+    sep='\n')
+```
 
 Inline Code:
 ```
@@ -343,7 +343,9 @@ The `knitr` R package allows one to execute R code within a document, and to dis
 
 *Placing the following text in an R Markdown file*
 
-<code>The sum of 2 and 2 is &#96;r 2+2&#96;.</code>
+```{r echo=FALSE}
+cat("The sum of 2 and 2 is `r 2+2`.")
+```
 
 *produces in the output file*  
 
@@ -353,12 +355,14 @@ The sum of 2 and 2 is `r 2+2`.
 
 Chunks of R code separated from the text.  In R Markdown:
 
-<pre><code>```{r}
-x <- 2
-x + 1
-print(x)
+```{r, echo=FALSE}
+cat(c("```{r}",
+      "x <- 2",
+      "x + 1",
+      "print(x)",
+      "```"), 
+    sep='\n')
 ```
-</code></pre>
 
 Output in file:
 ```{r}
@@ -371,12 +375,14 @@ print(x)
 
 In R Markdown:
 
-<pre><code>```{r, echo=FALSE}
-x <- 2
-x + 1
-print(x)
+```{r, echo=FALSE}
+cat(c("```{r, echo=FALSE}",
+      "x <- 2",
+      "x + 1",
+      "print(x)",
+      "```"), 
+    sep='\n')
 ```
-</code></pre>
 
 Output in file:
 ```{r, echo=FALSE}
@@ -389,12 +395,14 @@ print(x)
 
 In R Markdown:
 
-<pre><code>```{r, results="hide"}
-x <- 2
-x + 1
-print(x)
+```{r, echo=FALSE}
+cat(c("```{r, results=\"hide\"}",
+      "x <- 2",
+      "x + 1",
+      "print(x)",
+      "```"), 
+    sep='\n')
 ```
-</code></pre>
 
 Output in file:
 ```{r, results="hide"}
@@ -407,12 +415,14 @@ print(x)
 
 In R Markdown:
 
-<pre><code>```{r, include=FALSE}
-x <- 2
-x + 1
-print(x)
+```{r, echo=FALSE}
+cat(c("```{r, include=FALSE}",
+      "x <- 2",
+      "x + 1",
+      "print(x)",
+      "```"), 
+    sep='\n')
 ```
-</code></pre>
 
 Output in file:
 ```{r, include=FALSE}
@@ -426,12 +436,14 @@ print(x)
 
 In R Markdown:
 
-<pre><code>```{r, eval=FALSE}
-x <- 2
-x + 1
-print(x)
+```{r, echo=FALSE}
+cat(c("```{r, eval=FALSE}",
+      "x <- 2",
+      "x + 1",
+      "print(x)",
+      "```"), 
+    sep='\n')
 ```
-</code></pre>
 
 Output in file:
 ```{r, eval=FALSE}
@@ -444,28 +456,33 @@ print(x)
 
 Naming your chunks can be useful for identifying them in your file and during the execution, and also to denote dependencies among chunks.
 
-<pre><code>```{r my_first_chunk}
-x <- 2
-x + 1
-print(x)
+```{r, echo=FALSE}
+cat(c("```{r my_first_chunk}",
+      "x <- 2",
+      "x + 1",
+      "print(x)",
+      "```"), 
+    sep='\n')
 ```
-</code></pre>
-
 
 ## knitr Option: `cache`
 
 Sometimes you don't want to run chunks over and over, especially for large calculations.  You can "cache" them.
 
-<pre><code>```{r chunk1, cache=TRUE, include=FALSE}
-x <- 2
+```{r, echo=FALSE}
+cat(c("```{r chunk1, cache=TRUE, include=FALSE}",
+      "x <- 2",
+      "```"), 
+    sep='\n')
 ```
-</code></pre>
 
-<pre><code>```{r chunk2, cache=TRUE, dependson='chunk1'}
-y <- 3
-z <- x + y
+```{r, echo=FALSE}
+cat(c("```{r chunk2, cache=TRUE, dependson=\"chunk1\"}",
+      "y <- 3",
+      "z <- x + y",
+      "```"), 
+    sep='\n')
 ```
-</code></pre>
 
 This creates a directory called `cache` in your working directory that stores the objects created or modified in these chunks. When `chunk1` is modified, it is re-run.  Since `chunk2` depends on `chunk1`, it will also be re-run.
 
@@ -481,12 +498,13 @@ You can add chunk options regarding the placement and size of figures.  Examples
 
 If you will be using the same options on most chunks, you can set default options for the entire document.  Run something like this at the beginning of your document with your desired chunk options.
  
-<pre><code>```{r my_opts, cache=FALSE, echo=FALSE}
-library(knitr)
-opts_chunk$set(fig.align="center", fig.height=4, fig.width=6)
+```{r, echo=FALSE}
+cat(c("```{r my_opts, cache=FALSE, echo=FALSE}",
+      "library(\"knitr\")",
+      "opts_chunk$set(fig.align=\"center\", fig.height=4, fig.width=6)",
+      "```"), 
+    sep='\n')
 ```
-</code></pre>
-
 
 ## Documentation and Examples
 
@@ -768,3 +786,5 @@ a & b
 sessionInfo()
 ```
 </section>
+
+
