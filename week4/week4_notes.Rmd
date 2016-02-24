@@ -386,9 +386,296 @@ There are R packages that provide an interface  with specific APIs, such as the 
 
 # Exploratory Data Analysis
 
+## What is EDA?
+
+Exploratory data analysis (EDA) is the process of analzying data to uncover their key features.
+
+John Tukey pioneered this framework, writing a seminal book on the topic (called *Exploratory Data Analysis*).
+
+EDA involves calculating numerical summaries of data, visualizing data in a variety of ways, and considering interesting data points. 
+
+Before any model fitting is done to data, some exploratory data analysis should always be performed. 
+
+*Data science seems to focus much more on EDA than traditional statistics.*
+
+## Possible Steps to EDA
+
+*Exploratory Data Analysis with R* proposes some steps to EDA:
+
+1. Formulate your question
+1. Read in your data
+1. Check the packaging
+1. Run `str()`
+1. Look at the top and the bottom of your data
+1. Check your $n$'s (i.e., count things)
+1. Validate with at least one external data source
+1. Try the easy solution first
+1. Challenge your solution
+1. Follow up
+
+However, EDA involves much more than these steps...
+
+
+# Motor Trend Car Road Tests <br> Data Set
+
+## `mtcars` Data Set
+
+Let's use the Motor Trend Car Road Tests data set `mtcars` to establish some EDA techniques.
+
+```{r}
+data("mtcars", package="datasets")
+head(mtcars)
+```
+
 # Numerical Summaries of Data
 
+## Useful Summaries
+
+- **Center**: mean, median, mode
+
+- **Quantiles**: percentiles, five number summaries
+
+- **Spread**: standard deviation, variance, interquartile range
+
+- **Outliers**
+
+## Measures of Center
+
+Suppose we have data points $x_1, x_2, \ldots, x_n$.  
+
+**Mean**: $$\overline{x} = \frac{x_1 + x_2 + \cdots + x_n}{n}$$
+
+**Median**: Order the points $x_{(1)} \leq x_{(2)} \leq \cdots \leq x_{(n)}$.  The median is the middle value:  
+- $x_{((n+1)/2)}$ if $n$ is odd  
+- $(x_{(n/2)} + x_{(n/2+1)})/2$ if $n$ is even
+
+**Mode**: The most frequently repeated value among the data (if any).  If there are ties, then there is more than one mode.
+
+## Mean, Median, and Mode in R
+
+Let's calculate these quantities in R.
+
+```{r}
+mean(mtcars$mpg)
+median(mtcars$mpg)
+
+sample_mode <- function(x) {
+  as.numeric(names(which(table(x) == max(table(x)))))
+}
+
+sample_mode(round(mtcars$mpg))
+```
+
+It appears there is no R base function for calculating the mode.
+
+## Quantiles and Percentiles
+
+The $p$th **percentile** of $x_1, x_2, \ldots, x_n$ is a number such that $p$% of the data are less than this number.
+
+The 25th, 50th, and 75th percentiles are called 1st, 2nd, and 3rd "quartiles", respectively. These are sometimes denoted as Q1, Q2, and Q3. The median is the 50th percentile aka the 2nd quartile aka Q2.
+
+In general, $q$-**quantiles** are cut points that divide the data into $q$ approximately equally sized groups.  The cut points are the percentiles $1/q, 2/q, \ldots, (q-1)/q.$
+
+## Five Number Summary
+
+The "five number summary" is the minimum, the three quartiles, and the maximum. This can be calculated via `fivenum()` and `summary()`. [They can produce different values.](https://chemicalstatistician.wordpress.com/2013/08/12/exploratory-data-analysis-the-5-number-summary-two-different-methods-in-r-2/) Finally, `quantile()` extracts any set of percentiles.
+
+```{r}
+fivenum(mtcars$mpg)
+summary(mtcars$mpg)
+
+quantile(mtcars$mpg, prob=seq(0, 1, 0.25))
+```
+
+## Measures of Spread
+
+The variance, standard deviation (SD), and interquartile range (IQR) measure the "spread" of the data.
+
+**Variance**:
+$$s^2 = \frac{\sum_{i=1}^n \left(x_i - \overline{x}\right)^2}{n-1}$$
+
+**Standard Deviation**: $s = \sqrt{s^2}$
+
+**Iterquartile Range**: IQR $=$ Q3 $-$ Q1 
+
+The SD and IQR have the same units as the observed data, but the variance is in squared units.
+
+
+## Variance, SD, and IQR in R
+
+Variance:
+```{r}
+var(mtcars$mpg)
+```
+
+Standard deviation:
+```{r}
+sd(mtcars$mpg)
+```
+
+Interquartile range:
+```{r}
+IQR(mtcars$mpg)
+diff(fivenum(mtcars$mpg)[c(2,4)])
+```
+
+## Identifying Outliers
+
+An **outlier** is an unusual data point.  Outliers can be perfectly valid but they can also be due to errors (as can non-outliers). 
+
+One must define what is meant by an outlier. 
+
+One definition is a data point that less than Q1 or greater than Q3 by 1.5 $\times$ IQR or more.
+
+Another definition is a data point whose difference from the mean is greater than 3 $\times$ SD or more. For Normal distributed data (bell curve shaped), the probability of this is less than 0.27%.
+
+## Application to `mtcars` Data
+
+```{r}
+sd_units <- abs(mtcars$wt - mean(mtcars$wt))/sd(mtcars$wt)
+sum(sd_units > 3)
+max(sd_units)
+
+iqr_outlier_cuts <- fivenum(mtcars$wt)[c(2,4)] + 
+      c(-1.5, 1.5)*diff(fivenum(mtcars$wt)[c(2,4)])
+sum(mtcars$wt < iqr_outlier_cuts[1] | 
+    mtcars$wt > iqr_outlier_cuts[2])
+```
+
 # Data Visualization Basics
+
+## Plots
+
+- Single variables:
+    - Barplot
+    - Boxplot
+    - Histogram
+    - Density plot
+- Two or more variables:
+    - Side-by-Side Boxplots
+    - Stacked Barplot
+    - Scatterplot
+
+## R Base Graphics
+
+- We'll be plodding through "R base graphics" this week, which means graphics functions that come with R.  
+
+- By default they are very simple.  However, they can be customized *a lot*, but it takes *a lot* of work. 
+
+- Also, the syntax varies significantly among plot types and some think the syntax is not user-friendly.
+
+- We will consider a very highly used graphics package next week, called `ggplot2` that provides a "grammar of graphics". It hits a sweet spot of "flexibility vs. complexity" for many data scientists.
+
+## Read the Documentation
+
+For all of the plotting functions covered below, read the help files.
+
+```{r, eval=FALSE}
+?barplot
+?boxplot
+?hist
+?density
+?plot
+?legend
+```
+
+## Barplot
+
+```{r, eval=FALSE}
+cyl_tbl <- table(mtcars$cyl)
+barplot(cyl_tbl, xlab="Cylinders", ylab="Count")
+```
+
+```{r, echo=FALSE}
+cyl_tbl <- table(mtcars$cyl)
+barplot(cyl_tbl, xlab="Cylinders", ylab="Count", ylim=c(0,16))
+```
+
+## Boxplot
+
+```{r}
+boxplot(mtcars$mpg, ylab="MPG", col="lightgray")
+```
+
+## Constructing Boxplots
+
+- The top of the box is Q3
+- The line through the middle of the box is the median
+- The bottom of the box is Q1
+- The top whisker is the minimum of Q3 + 1.5 $\times$ IQR or the largest data point
+- The bottom whisker is the maximum of Q1 - 1.5 $\times$ IQR or the smallest data point
+- Outliers lie outside of (Q1 - 1.5 $\times$ IQR) or (Q3 + 1.5 $\times$ IQR), and they are shown as points
+- Outliers are calculated using the `fivenum()` function
+
+
+## Boxplot with Outliers
+
+```{r}
+boxplot(mtcars$wt, ylab="Weight (1000 lbs)", 
+        col="lightgray")
+```
+
+## Histogram
+
+```{r}
+hist(mtcars$mpg, xlab="MPG", main="", col="lightgray")
+```
+
+## Histogram with More Breaks
+
+```{r}
+hist(mtcars$mpg, breaks=12, xlab="MPG", main="", col="lightgray")
+```
+
+
+## Density Plot
+
+```{r}
+plot(density(mtcars$mpg), xlab="MPG", main="")
+polygon(density(mtcars$mpg), col="lightgray", border="black")
+```
+
+## Boxplot (Side-By-Side)
+
+```{r}
+boxplot(mpg ~ cyl, data=mtcars, xlab="Cylinders", 
+        ylab="MPG", col="lightgray")
+```
+
+## Stacked Barplot
+
+```{r}
+counts <- table(mtcars$cyl, mtcars$gear)
+counts
+```
+
+```{r, eval=FALSE}
+barplot(counts, main="Number of Gears and Cylinders",
+  xlab="Gears", col=c("blue","red", "lightgray"))
+legend(x="topright", title="Cyl",
+       legend = rownames(counts), 
+       fill = c("blue","red", "lightgray"))
+```
+
+
+```{r, echo=FALSE, fig.height=7, small.mar=FALSE}
+par(mar = c(4, 4, 1, 1))
+counts <- table(mtcars$cyl, mtcars$gear)
+barplot(counts, main="Number of Gears and Cylinders",
+  xlab="Gears", col=c("blue","red", "lightgray"), ylim=c(0,16))
+legend(x="topright", title="Cyl",
+       legend = rownames(counts), 
+       fill = c("blue","red", "lightgray"))
+```
+
+
+
+## Scatterplot
+
+```{r}
+plot(mtcars$wt, mtcars$mpg, xlab="Weight (1000 lbs)", 
+     ylab="MPG")
+```
 
 # Extras
 
