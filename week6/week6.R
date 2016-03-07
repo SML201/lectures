@@ -1,5 +1,5 @@
 ## ----my_opts, cache=FALSE, include=FALSE---------------------------------
-library(knitr)
+library(knitr) 
 knit_hooks$set(small.mar = function(before, options, envir) {
     if (before) par(mar = c(4, 4, .1, .1))  # smaller margin on top and right
 })
