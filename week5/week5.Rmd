@@ -256,7 +256,7 @@ ggplot(data = diamonds) +
 
 ----
 
-The `geom_boxplot()` layer forms a boxplot and only requires both `x` and `y` assignments in the `aes()` call, even when plotting a single boxplot:
+The `geom_boxplot()` layer forms a boxplot and requires both `x` and `y` assignments in the `aes()` call, even when plotting a single boxplot:
 
 ```{r}
 ggplot(data = mpg) + 
@@ -344,7 +344,7 @@ ggplot(diamonds) +
 
 ----
 
-We can create a histogram using the `geom_histogram()` layer, whih requires an `x` argument only in the `aes()` call:
+We can create a histogram using the `geom_histogram()` layer, which requires an `x` argument only in the `aes()` call:
 
 ```{r, message=FALSE}
 ggplot(diamonds) +
@@ -420,7 +420,7 @@ ggplot(diamonds, mapping = aes(x=price)) +
 
 ----
 
-<h2>`babynames` Revisited!</h2>
+<h2>`babynames` Revisited</h2>
 
 Let's first create a data frame that captures the number of times "John" is registered in males per year:
 
@@ -621,11 +621,11 @@ ggplot(diamonds) +
 
 <h2>Fitting "Smoothers" and Other Models to Scatterplots</h2>
 
+<p style="font-size: 1em;">
 - Later this semester, we will spend several weeks learning how to explain or predict an outcome variable in terms of predictor variables  
-
 - We will briefly show here how to plot some simple model fits to scatterplots
-
 - You may want to return to these slides later in the semester once we cover modeling in more detail
+</p>
 
 ----
 
@@ -683,11 +683,11 @@ ggplot(data = mpg, mapping = aes(x = displ, y = hwy, color=drv)) +
 
 <h2> Definition </h2>
 
+<p style="font-size: 1em;">
 - Overplotting occurs when there are many observations, resulting in many objects being plotted on top of each other
-
 - For example, the `diamonds` data set has `r nrow(diamonds)` observations per variable
-
 - Let's explore some ways to deal with overplotting
+</p>
 
 ----
 
@@ -742,7 +742,7 @@ We can combine the scale transformation used earlier with the "hexbin" plotting 
 
 ```{r}
 ggplot(data = diamonds, mapping = aes(x=carat, y=price)) +
-  geom_hex(bins=20) + scale_fill_gradient() +
+  geom_hex(bins=20) +
   scale_x_log10(breaks=1:5) + scale_y_log10(breaks=c(1000,5000,10000)) 
 ```
 
@@ -1047,11 +1047,15 @@ ggplot(data = diamonds) +
 
 ## License
 
+<p style="font-size: 1em;">
 <https://github.com/SML201/lectures/blob/master/LICENSE.md>
+</p>
 
 ## Source Code
 
+<p style="font-size: 1em;">
 <https://github.com/SML201/lectures/tree/master/week5>
+</p>
 
 ## Session Information
 
