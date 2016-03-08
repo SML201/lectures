@@ -240,7 +240,7 @@ $${\rm E}[X] = \int_{-\infty}^{\infty} x \  f(x) \  dx \ \ \ \ \mbox{(continuous
 
 The **variance**, also called the "population variance", is a measure of spread for a rv.  It is calculated in a fashion analogous to the sample variance:
 
-$${\rm Var}(X) = {\rm E} \left[\left(X-{\rm E}[X]\right)^2\right]; \quad \quad {\rm SD}(X) = \sqrt{{\rm Var}(X)}$$
+$${\rm Var}(X) = {\rm E} \left[\left(X-{\rm E}[X]\right)^2\right]; \quad \quad {\rm SD}(X) = \sqrt{\operatorname{Var}(X)}$$
 
 $${\rm Var}(X) = \sum_{x \in S} \left(x-{\rm E}[X]\right)^2 \ f(x) \ \ \ \ \mbox{(discrete)}$$
 
