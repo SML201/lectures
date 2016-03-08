@@ -81,7 +81,7 @@ Recall Figure 2.1 from *Elements of Data Analytic Style* (shown in Week 1).
 
 An important calclation in probability and statistics is the conditional probability.  We can consider the probability of an event $A$, conditional on the fact that we are restricted to be within event $B$.  This is defined as:
 
-$${\rm Pr}(A | B) = \frac{{\rm Pr}(A \mbox{ and } B)}{{\rm Pr}(B)}$$
+$${\rm Pr}(A | B) = \frac{\operatorname{Pr}(A \mbox{ and } B)}{\operatorname{Pr}(B)}$$
 
 ## Independence
 
@@ -97,7 +97,7 @@ All three of these are equivalent.
 
 A common approach in statistics is to obtain a conditional probability of two events through the opposite conditional probability and their marginal probability. This is called Bayes Theorem:
 
-$${\rm Pr}(B | A) = \frac{{\rm Pr}(A | B){\rm Pr}(B)}{{\rm Pr}(A)}$$
+$${\rm Pr}(B | A) = \frac{\operatorname{Pr}(A | B){\rm Pr}(B)}{\operatorname{Pr}(A)}$$
 
 # Random Variables
 
