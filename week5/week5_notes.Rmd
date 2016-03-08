@@ -20,7 +20,7 @@ knit_hooks$set(
   }
   )
 
-opts_chunk$set(fig.align="center", fig.height=5.5, fig.width=6.75, 
+opts_chunk$set(fig.align="center", fig.height=3, fig.width=4.5, 
                collapse=TRUE, comment="", prompt=TRUE, 
                small.mar=TRUE, cache=TRUE)
 
