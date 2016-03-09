@@ -27,7 +27,7 @@ set.seed(201)
 
 ## Roles In Data Science
 
-Probability and statistics are required in data science whenever the goals include:
+Probabilistic modeling and/or statistical inference are required in data science when the goals include:
 
 1.  Characterizing randomness or "noise" in the data
 2.  Quantifying uncertainty in models we build or decisions we make from the data
@@ -39,13 +39,11 @@ Probability and statistics are required in data science whenever the goals inclu
 
 ## Data Analysis Without Probability
 
-It is possible to do data analysis without probability and formal statistical inference.  
+It is possible to do data analysis without probability and formal statistical inference:  
 
-Exploratory data analysis and visualization tend to not involve probability or formal statistical inference.
-
-Important problems machine learning do not involve probability or statistical inference.
-
-Recall Figure 2.1 from *Elements of Data Analytic Style* (shown in Week 1).
+- Exploratory data analysis and visualization tend to not involve probability or formal statistical inference
+- Important problems in machine learning do not involve probability or statistical inference.
+- Recall Figure 2.1 from *Elements of Data Analytic Style* (shown in Week 1)
 
 # Probability
 
@@ -61,12 +59,14 @@ Recall Figure 2.1 from *Elements of Data Analytic Style* (shown in Week 1).
 
 ## Sample Spaces We Consider
 
-- $S$ = {1, 2, ..., $n$}
+- $S$ = {0, 1, 2, ..., $n$}
 - $S$ = {0, 1, 2, 3, ...}
 - $S$ = [0, $\infty$)
 - $S$ = $\mathbb{R}$ = (-$\infty$, $\infty$)
 
 ## Mathematical Probability
+
+A proper mathematical formulation of a probability measure should include the following properties:
 
 1. The probability of any even $A$ is such that $0 \leq {\rm Pr}(A) \leq 1$
 2. If $S$ is the sample space then ${\rm Pr}(S)=1$
@@ -74,6 +74,8 @@ Recall Figure 2.1 from *Elements of Data Analytic Style* (shown in Week 1).
 4. If $A \mbox{ and } B = \varnothing$, then ${\rm Pr}(A \mbox{ or } B) = {\rm Pr}(A) + {\rm Pr}(B)$, where $\varnothing$ is the empty set
 
 ## Two Events
+
+The probability of two events are calculated by the following general relationship:
 
 <center>![union_probs](images/union_probs.png)</center>
 
@@ -99,15 +101,19 @@ A common approach in statistics is to obtain a conditional probability of two ev
 
 $${\rm Pr}(B | A) = \frac{\operatorname{Pr}(A | B){\rm Pr}(B)}{\operatorname{Pr}(A)}$$
 
+This forms the basis of *Bayesian Inference* but has more general use in carrying out probability calculations.
+
 # Random Variables
 
 ## Definition
 
 We will define a **random variable** (rv) to be a variable that takes values according to a probability distribution.
 
-We define a random variable through its **probability mass function** (pmf) for discrete rv's or its **probability density function** (pdf) for continuous rv's.  We can also define it through its **cumulative distribution function** (cdf).  The pmf/pdf determines the cdf, and vice versa.
+We define a random variable through its **probability mass function** (pmf) for discrete rv's or its **probability density function** (pdf) for continuous rv's.  
 
-Note: There's a more technical and rigorous definition of a rv, but it does not affect how we will use random variables.
+We can also define the rv through its **cumulative distribution function** (cdf).  The pmf/pdf determines the cdf, and vice versa.
+
+<p style="font-size: 0.75em;">Note: There's a more technical and rigorous definition of a rv, but it does not affect how we will use random variables.</p>
 
 ## Discrete Random Variables
 
@@ -116,16 +122,6 @@ A discrete rv $X$ takes on a discrete set of values such as $S$ = {1, 2, ..., $n
 Its distribution is characterized by its pmf: $$f(x) = {\rm Pr}(X = x) \mbox{ for } x \in S.$$
 
 Its cdf is: $$F(y) = {\rm Pr}(X \leq y) = \sum_{x \leq y} {\rm Pr}(X = x).$$
-
-## Continuous Random Variables
-
-A continuous rv $X$ takes on a continuous set of values such as $S$ = [0, $\infty$) or $S$ = $\mathbb{R}$ = (-$\infty$, $\infty$).
-
-The probability $X$ takes on any specific value is 0.  Its pdf $f(x)$ therefore gives an infinitesimal, local, relative probability.
-
-For $S$ = (-$\infty$, $\infty$), its cdf is: $$F(y) = {\rm Pr}(X \leq y) = \int_{-\infty}^y f(x) dx.$$
-
-When $S$ = [0, $\infty$), the integral starts at 0.
 
 ## Example: Discrete PMF
 
@@ -154,7 +150,6 @@ ggplot(data=df) +
   labs(x="y", y="F(y)")
 ```
 
-
 ## Probabilities of Events Via Discrete CDF
 
 Examples: 
@@ -166,6 +161,17 @@ Examples:
 | ${\rm Pr}(X > a)$ | $1-F(a)$ | $\sum_{x > a} f(x)$ |
 | ${\rm Pr}(a \leq X \leq b)$ | $F(b) - F(a-1)$ | $\sum_{a \leq x \leq b} f(x)$ |
 | ${\rm Pr}(a < X \leq b)$ | $F(b) - F(a)$ | $\sum_{a < x \leq b} f(x)$ |
+
+
+## Continuous Random Variables
+
+A continuous rv $X$ takes on a continuous set of values such as $S$ = [0, $\infty$) or $S$ = $\mathbb{R}$ = (-$\infty$, $\infty$).
+
+The probability that $X$ takes on any specific value is 0; but the probability it lies within an interval can be non-zero.  Its pdf $f(x)$ therefore gives an infinitesimal, local, relative probability.
+
+For $S$ = (-$\infty$, $\infty$), its cdf is: $$F(y) = {\rm Pr}(X \leq y) = \int_{-\infty}^y f(x) dx.$$
+
+When $S$ = [0, $\infty$), the integral starts at 0.
 
 ## Example: Continuous PDF
 
@@ -226,7 +232,7 @@ We earlier discussed measures of center and spread for a set of data, such as th
 
 Analogous measures exist for probability distributions.  
 
-These are two types are distinguished by calling those on data "sample" measures and those on probability distributions "population" measures.  
+These are distinguished by calling those on data "sample" measures (e.g., sample mean) and those on probability distributions "population" measures (e.g., population mean).  
 
 ## Expected Value
 
@@ -298,11 +304,25 @@ mean(x) - (n+1)/2
 var(x) - (n^2-1)/12
 ```
 
+## Bernoulli
+
+A single success/failure event, such as heads/tails when flipping a coin or survival/death.
+
+$$X \sim \mbox{Bernoulli}(p)$$
+
+$$S = \{0, 1\}$$
+
+$$f(x) = p^x (1-p)^{1-x} \mbox{ for } x \in S$$
+
+$${\rm E}[X] = p, \ {\rm Var}(X) = p(1-p)$$
+
 ## Binomial
+
+An extension of the Bernoulli distribution to simultaneously considering $n$ independent success/failure trials and counting the number of successes.
 
 $$X \sim \mbox{Binomial}(n, p)$$
 
-$$S = \{1, 2, \ldots, n\}$$
+$$S = \{0, 1, 2, \ldots, n\}$$
 
 $$f(x) = {n \choose x} p^x (1-p)^{n-x} \mbox{ for } x \in S$$
 
@@ -342,6 +362,8 @@ str(rbinom)
 ```
 
 ## Poisson
+
+Models the number of occurrences of something within a defined time/space period, where the occurrences are independent. Examples: the number of lightning strikes on campus in a given year; the number of emails received on a given day.
 
 $$X \sim \mbox{Poisson}(\lambda)$$
 
@@ -386,6 +408,8 @@ str(rpois)
 
 ## Uniform (Continuous)
 
+Models the scenario where all values in the unit interval [0,1] are equally likely.
+
 $$X \sim \mbox{Uniform}(0,1)$$
 
 $$S = [0,1]$$
@@ -427,6 +451,8 @@ str(runif)
 
 ## Exponential
 
+Models a time to failure and has a "memoryless property".  
+
 $$X \sim \mbox{Exponential}(\lambda)$$
 
 $$S = [0, \infty)$$
@@ -466,6 +492,8 @@ str(rexp)
 ```
 
 ## Normal
+
+Due to the Central Limit Theorem (covered later), this "bell curve" distribution is often observed in properly normalized real data.
 
 $$X \sim \mbox{Normal}(\mu, \sigma^2)$$
 
@@ -544,7 +572,7 @@ Let $X_1, X_2, \ldots, X_{40}$ be iid Poisson($\lambda$) with $\lambda=6$.
 
 We will form $\sqrt{40}(\overline{X} - 6)$ over 10,000 realizations and compare their distribution to a Normal(0, 6) distribution.
 
-```{r}
+```{r clt_demo, cache=TRUE}
 x <- replicate(n=1e4, expr=rpois(n=40, lambda=6), 
                simplify="matrix")
 x_bar <- apply(x, 2, mean)
@@ -557,7 +585,7 @@ df <- data.frame(clt=clt, x = seq(-18,18,length.out=1e4),
 
 ## Example: Plot
 
-```{r}
+```{r clt_plot, cache=TRUE}
 ggplot(data=df) +
   geom_histogram(aes(x=clt, y=..density..), color="blue", 
                  fill="lightgray", binwidth=0.75) +
@@ -571,6 +599,22 @@ ggplot(data=df) +
 - Suppose data are collected in such a way that it is randomly observed according to a probability distribution
 - If that probability distribution can be parameterized, then it is possible that the parameters describe key characteristics of the population of interest
 - **Statistical inference** reverse engineers this process to estimate the unknown values of the parameters and express a measure of uncertainty about these estimates
+
+## Example: Simple Random Sample
+
+Individuals are uniformly and independently randomly sampled from a population.
+
+The measurements taken on these individuals are then modeled as random variables, specifically random realizations from the complete population of values.
+
+Simple random samples form the basis of modern surveys.
+
+## Exmaple: Randomized Controlled Trial
+
+Individuals under study are randomly assigned to one of two or more available treatments.
+
+This induces randomization directly into the study and breaks the relationship between the treatments and other variables that may be influencing the response of interest.
+
+This is the gold standard study design in clinical trials to assess the evidence that a new drug works on a given disease.
 
 ## Parameters and Statistics
 
@@ -600,7 +644,7 @@ I flip it 20 times and it lands on heads 16 times.
 
 Let's simulate 10,000 times what my estimate would look like if $p=0.5$ and I repeated the 20 coin flips over and over.  
 
-```{r}
+```{r sampling_demo, cache=TRUE}
 x <- replicate(n=1e4, expr=rbinom(1, size=20, prob=0.5))
 sim_p_hat <- x/20
 my_p_hat <- 16/20
@@ -609,7 +653,7 @@ my_p_hat <- 16/20
 What can I do with this information?
 
 ## Example (cont'd)
-```{r, echo=FALSE}
+```{r sampling_plot, cache=TRUE, echo=FALSE}
 df <- data.frame(x=sim_p_hat)
 ggplot(data=df, aes(x=x)) + 
   geom_histogram(color="blue", fill="lightgray", binwidth=0.05) + 
