@@ -608,7 +608,7 @@ The measurements taken on these individuals are then modeled as random variables
 
 Simple random samples form the basis of modern surveys.
 
-## Exmaple: Randomized Controlled Trial
+## Example: Randomized Controlled Trial
 
 Individuals under study are randomly assigned to one of two or more available treatments.
 
