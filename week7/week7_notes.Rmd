@@ -77,7 +77,7 @@ df <- data.frame(clt=clt, x = seq(-18,18,length.out=1e4),
 
 ## Example: Plot
 
-```{r clt_plot, cache=TRUE}
+```{r clt_plot, cache=TRUE, dependson="clt_demo"}
 ggplot(data=df) +
   geom_histogram(aes(x=clt, y=..density..), color="blue", 
                  fill="lightgray", binwidth=0.75) +
@@ -232,7 +232,7 @@ forms the "level" or coverage probability of the interval.
 
 If we repeat the study many times, then the CI $(\hat{\mu} - C_{\ell}, \hat{\mu} + C_{u})$ will contain the true value $\mu$ with a long run frequency equal to ${\rm Pr}(\mu - C_{\ell} \leq \hat{\mu} \leq \mu + C_{u})$.
 
-A CI is *not* intepreted as: "There is probability ${\rm Pr}(\mu - C_{\ell} \leq \hat{\mu} \leq \mu + C_{u})$ that $\mu$ is in our calculated $(\hat{\mu} - C_{\ell}, \hat{\mu} + C_{u})$."  Why?
+A CI calculated on an observed data set is *not* intepreted as: "There is probability ${\rm Pr}(\mu - C_{\ell} \leq \hat{\mu} \leq \mu + C_{u})$ that $\mu$ is in our calculated $(\hat{\mu} - C_{\ell}, \hat{\mu} + C_{u})$."  Why not?
 
 
 <center>![Confidence_Intervals_Coverage](images/ci.png)</center>
@@ -305,4 +305,236 @@ $$(1-\alpha)\mbox{-level upper: } \left(-\infty, \hat{\mu} + |z_{\alpha}| \frac{
 
 $$(1-\alpha)\mbox{-level lower: } \left(\hat{\mu} - |z_{\alpha}| \frac{\sigma}{\sqrt{n}}, \infty\right)$$
 
+# Hypothesis Tests
+
+## Example: HT on Fairness of a Coin
+
+Suppose I claim that a specific coin is fair, i.e., that it lands on heads or tails with equal probability.  
+
+I flip it 20 times and it lands on heads 16 times.
+
+1. My data is $x=16$ heads out of $n=20$ flips.
+2. My data generation model is $X \sim \mbox{Binomial}(20, p)$.
+3. I form the statistic $\hat{p} = 16/20$ as an estimate of $p$.
+
+More formally, I want to **test the hypothesis**:  $H_0: p=0.5$ vs. $H_1: p \not=0.5$ under the model $X \sim \mbox{Binomial}(20, p)$ based on the **test statistic** $\hat{p} = X/n$.
+
+## Example (cont'd): Null Distribution
+
+Let's simulate 10,000 times what my estimate would look like if $p=0.5$ and I repeated the 20 coin flips over and over.  
+
+```{r sampling_demo_2, cache=TRUE}
+x <- replicate(n=1e4, expr=rbinom(1, size=20, prob=0.5))
+sim_p_hat <- x/20
+my_p_hat <- 16/20
+```
+
+The vector `sim_p_hat` contains 10,000 draws from the **null distribution**, i.e., the distribution of my test statstic $\hat{p} = X/n$ when $H_0: p=0.5$ is true.
+
+
+```{r sampling_plot_2, cache=TRUE, echo=FALSE, dependson="sampling_demo_2"}
+df <- data.frame(sim_p_hat=sim_p_hat)
+ggplot(data=df, aes(x=sim_p_hat)) + 
+  geom_histogram(color="blue", fill="lightgray", binwidth=0.05) + 
+  geom_vline(xintercept=my_p_hat, size=1.5) +
+  labs(title="Histogram of Null Distribution Draws") +
+  geom_text(aes(my_p_hat, 1500, label="obs. p_hat"), nudge_x=0.075)
+```
+
+## Example (cont'd): P-value
+
+The deviation of the test statistic from the null hypothesis can be measured by $|\hat{p} - 0.5|$.  
+
+Let's compare our observed deviation $|16/20 - 0.5|$ to the 10,000 simulated null data sets.  Specifically, let's calculate the frequency by which these 10,000 cases are **as or more extreme** than the observed test statistic.
+
+```{r, cache=TRUE, dependson="sampling_demo_2"}
+sum(abs(sim_p_hat-0.5) >= abs(my_p_hat-0.5))/1e4
+```
+
+This quantity is called the **p-value** of the hypothesis test.
+
+## A Caveat
+
+This example is a simplification of a more general framework for testing statistical hypotheses.
+
+Given the intuition provided by the example, let's now formalize these ideas.
+
+## Definition
+
+- A **hypothesis test** or **significance test** is a formal procedure for comparing observed data with a hypothesis whose truth we want to assess
+- The results of a test are expressed in terms of a probability that measures how well the data and the hypothesis agree
+- The **null hypothesis** ($H_0$) is the statement being tested, typically the status quo
+- The **alternative hypothesis** ($H_1$) is the complement of the null, and it is often the "interesting" state
+
+## Return to Normal Example
+
+Let's return to our Normal example in order to demonstrate the framework.
+
+Suppose a simple random sample of $n$ data points is collected so that the following model of the data is reasonable: $X_1, X_2, \ldots, X_n$ are iid Normal($\mu$, $\sigma^2$).
+
+The goal is to do test a hypothesis on $\mu$, the population mean.
+
+For simplicity, assume that $\sigma^2$ is known (e.g., $\sigma^2 = 1$).
+
+## HTs on Parameter Values
+
+Hypothesis tests are usually formulated in terms of values of parameters.  For example:
+
+$$H_0: \mu = 5$$
+
+$$H_1: \mu \not= 5$$
+
+Note that the choice of 5 here is arbitrary, for illustrative purposes only.  In a typical real world problem, the values that define the hypotheses will be clear from the context.
+
+## Two-Sided vs. One-Sided HT
+
+Hypothesis tests can be two-sided or one-sided:
+
+$$H_0: \mu = 5 \mbox{ vs. } H_1: \mu \not= 5 \mbox{ (two-sided)}$$
+
+$$H_0: \mu \leq 5 \mbox{ vs. } H_1: \mu > 5 \mbox{ (one-sided)}$$
+
+$$H_0: \mu \geq 5 \mbox{ vs. } H_1: \mu < 5 \mbox{ (one-sided)}$$
+
+## Test Statistic
+
+A **test statistic** is designed to *quantify the evidence against the null hypothesis in favor of the alternative*.  They are usually defined (and justified using math theory) so that the larger the test statistic is, the more evidence there is.
+
+For the Normal example and the two-sided hypothesis $(H_0: \mu = 5 \mbox{ vs. } H_1: \mu \not= 5)$, here is our test statistic:
+
+$$
+|z| = \frac{\left|\overline{x} - 5\right|}{\sigma/\sqrt{n}}
+$$
+
+What would the test statistic be for the one-sided hypothesis tests?
+
+## Null Distribution (Two-Sided)
+
+The **null distribution** is the sampling distribution of the test statistic when $H_0$ is true.
+
+We saw earlier that $\frac{\overline{X} - \mu}{\sigma/\sqrt{n}} \sim \mbox{Normal}(0,1).$
+
+When $H_0$ is true, then $\mu=5$. So when $H_0$ is true it follows that
+
+$$Z = \frac{\overline{X} - 5}{\sigma/\sqrt{n}} \sim \mbox{Normal}(0,1)$$
+
+and then probabiliy calculations on $|Z|$ are straightforward.  Note that $Z$ is pivotal when $H_0$ is true!
+
+## Null Distribution (One-Sided)
+
+When performing a one-sided hypothesis test, such as $H_0: \mu \leq 5 \mbox{ vs. } H_1: \mu > 5$, the null distribution is typically calculated under the "least favorable" value, which is the boundary value.  
+
+In this example it would be $\mu=5$ and we would again utilize the null distribution
+$$Z = \frac{\overline{X} - 5}{\sigma/\sqrt{n}} \sim \mbox{Normal}(0,1).$$
+
+## P-values
+
+The **p-value** is defined to be the probability that a test statistic from the null distribution is *as or more extreme than the observed statistic*.  In our Normal example on the two-sided hypothesis test, the p-value is
+
+$${\rm Pr}(|Z^*| \geq |z|)$$
+
+where $Z^* \sim \mbox{Normal}(0,1)$ and $|z|$ is the value of the test statistic calculated on the data (so it is a fixed number once we observe the data).
+
+## Calling a Test "Significant"
+
+A hypothesis test is called **statistically significant** --- meaning we reject $H_0$ in favor of $H_1$ --- if its p-value is sufficiently small. 
+
+Commonly used cut-offs are 0.01 or 0.05, although these are not always appropriate.
+
+Applying a specific p-value cut-off to determine significance determines an error rate, which we define next.
+
+## Types of Errors
+
+There are two types of errors that can be committed when performing a hypothesis test.
+
+1. A **Type I error** or **false positive** is when a hypothesis test is called signficant and the null hypothesis is actually true.
+2. A **Type II error** or **false negative** is when a hypothesis test is not called signficant and the alternative hypothesis is actually true.
+
+## Error Rates
+
+- The **Type I error rate** or **false positive rate** is the probability of this type of error given that $H_0$ is true.
+- If a hypothesis test is called significant when p-value $\leq \alpha$ then it has a Type I error rate equal to $\alpha$.
+- The **Type II error rate** or **false negative rate** is the probability of this type of error given that $H_1$ is true.
+- The **power** of a hypothesis test is $1 -$ Type II error rate.
+
+Hypothesis tests are usually derived with a goal to control the Type I error rate while maximizing the power.
+
+# CLT for Common Estimators
+
+## The Normal Example
+
+We formulated both confidence intervals and hypothesis tests under the following "example":
+
+> Suppose a simple random sample of $n$ data points is collected so that the following model of the data is reasonable: $X_1, X_2, \ldots, X_n$ are iid Normal($\mu$, $\sigma^2$).
+> The goal is to do inference on $\mu$, the population mean.
+> For simplicity, assume that $\sigma^2$ is known (e.g., $\sigma^2 = 1$).
+
+
+There is a good reason why we did this.
+
+## Normal Pivotal Statistics
+
+The random variable distributions we introduced in Week 6 all have parameter estimators that can be standardized to yield a pivotal statistic with a Normal(0,1) distribution.  
+
+For example, if $X \sim \mbox{Binomial}(n,p)$ and $\hat{p}=X/n$, then for large $n$ it approximately holds that:
+$$
+\frac{\hat{p} - p}{\sqrt{\frac{\hat{p}(1-\hat{p})}{n}}} \sim \mbox{Normal}(0,1).
+$$
+
+We will cover these results next week, which will allow us to directlty leverage the Normal case we worked out this week.
+
+# Bayesian Inference
+
+## Frequentist Probability
+
+The inference framework we have covered so far uses a **frequentist** intepretation of probability.  
+
+We made statements such as, "If we repeat this study over and over, the long run frequency is such that..."
+
+## The Framework
+
+**Bayesian inference** is based on a different interpretation of probability, that probability is a measure of subjective belief.
+
+A **prior probability distribution** is introduced for an unknown parameter, which is a probability distribution on the unknown parameter that captures your subjective belief about its possible values.
+
+The **posterior probability distributuon** of the parameter is then calculated using Bayes theorem once data are observed.  Analogs of confidence intervals and hypothesis tests can then be obtained through the posterior distribution.
+
+## An Example
+
+Prior: $P \sim \mbox{Uniform}(0,1)$
+
+Data generating distribution: $X|P=p \sim \mbox{Binomial}(n,p)$
+
+Posterior (via Bayes Theorem):
+$$ {\rm Pr}(P | X=x) = \frac{{\rm Pr}(X=x | P) {\rm Pr}(P)}{{\rm Pr}(X=x)} $$
+
+## Calculations
+
+In the previous example, it is possible to analytically calculate the posterior distribution.  (In the example, it is a Beta distribution with parameters that involve $x$.) However, this is often impossible.
+
+Bayesian inference often involves complicated and intensive calculations to numerically approximate the posterior probability distribution.
+
+## Use in Practice
+
+Although the Bayesian inference framework has its roots in the subjective view of probability, in modern times this philosophical aspect is often ignored or unimportant.
+
+Instead, Bayesian inference is used because it provides a flexible and sometimes superior model for real world problems.
+
+# Extras
+
+## License
+
+<https://github.com/SML201/lectures/blob/master/LICENSE.md>
+
+## Source Code
+
+<https://github.com/SML201/lectures/tree/master/week7>
+
+## Session Information
+
+<section style="font-size: 0.75em;">
+```{r}
+sessionInfo()
+```
+</section>
 
