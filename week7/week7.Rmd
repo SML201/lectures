@@ -511,7 +511,7 @@ Prior: $P \sim \mbox{Uniform}(0,1)$
 Data generating distribution: $X|P=p \sim \mbox{Binomial}(n,p)$
 
 Posterior (via Bayes Theorem):
-$$ {\rm Pr}(P | X=x) = \frac{{\rm Pr}(X=x | P) {\rm Pr}(P)}{{\rm Pr}(X=x)} $$
+$$ {\rm Pr}(P | X=x) = \frac{\operatorname{Pr}(X=x | P) {\rm Pr}(P)}{\operatorname{Pr}(X=x)} $$
 
 ## Calculations
 
