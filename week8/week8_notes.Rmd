@@ -1,0 +1,760 @@
+---
+title: "SML 201 -- Week 8"
+author: "John D. Storey"
+date: "Spring 2016"
+output:
+  pdf_document:
+    toc: true
+    toc_depth: 2
+    keep_tex: true
+geometry: right=2.5in
+---
+
+```{r my_opts, cache=FALSE, include=FALSE}
+library(knitr)
+knit_hooks$set(small.mar = function(before, options, envir) {
+    if (before) par(mar = c(4, 4, .1, .1))  # smaller margin on top and right
+})
+opts_chunk$set(fig.align="center", fig.height=5.5, fig.width=6.75, collapse=TRUE, comment="", prompt=TRUE, small.mar=TRUE)
+options(width=63)
+library(ggplot2)
+theme_set(theme_bw())
+set.seed(201)
+```
+
+
+# CLT Revisited
+
+## Standardized RVs
+
+Note that in general for a rv $Y$ it is the case that 
+
+$$\frac{Y - \operatorname{E}[Y]}{\sqrt{\operatorname{Var}(Y)}}$$ 
+
+has population mean 0 and variance 1.
+
+## CLT for Standardized RVs
+
+Suppose $X_1, X_2, \ldots, X_n$ are iid rv's with population mean ${\rm E}[X_i] = \mu$ and variance ${\rm Var}(X_i) = \sigma^2$.  
+
+Then for "large $n$", 
+
+$$\frac{\overline{X} - \mu}{\sigma/\sqrt{n}}$$ 
+
+approximately follows the Normal$(0, 1)$ distribution.
+
+As $n \rightarrow \infty$, this approximation becomes exact.
+
+## Example: Standardized Poisson
+
+Let $X_1, X_2, \ldots, X_{40}$ be iid Poisson($\lambda$) with $\lambda=6$.
+
+We will form 
+
+$$\frac{\overline{X} - 6}{\sqrt{6}/\sqrt{40}}$$
+
+over 10,000 realizations and compare their distribution to a Normal(0, 1) distribution.
+
+```{r clt_std_demo, cache=TRUE}
+x <- replicate(n=1e4, expr=rpois(n=40, lambda=6), 
+               simplify="matrix")
+x_bar <- apply(x, 2, mean)
+clt_std <- (x_bar - 6)/(sqrt(6)/sqrt(40))
+
+df <- data.frame(z=clt_std, x = seq(-3.5,3.5,length.out=1e4), 
+                 y = dnorm(seq(-3.5,3.5,length.out=1e4)))
+# note that df$y are Normal(0,1) pdf values
+```
+
+
+```{r clt_std_plot, cache=TRUE, dependson="clt_std_demo"}
+ggplot(data=df) +
+  geom_histogram(aes(x=z, y=..density..), color="blue", 
+                 fill="lightgray", binwidth=0.3) +
+  geom_line(aes(x=x, y=y), size=1.5)
+```
+
+
+# Approximate Pivotal Statistics
+
+## Normal Distribution, Known Variance
+
+Last week we considered data modeled by $X_1, X_2, \ldots, X_n$ iid $\mbox{Normal}(\mu, \sigma^2)$ where we assumed that $\sigma^2$ is known.
+
+We derived $(1-\alpha)$-level confidence intervals and also hypothesis tests based on the pivotal statistic:
+
+$$\frac{\overline{X} - \mu}{\sigma/\sqrt{n}} \sim \mbox{Normal}(0,1).$$
+
+## Wider Application
+
+As it turns out, we can use these results for a wider range of distributions. Those we earlier introduced have approximately pivotal $\mbox{Normal}(0,1)$ statistics.
+
+They have the form:
+
+$$Z = \frac{\mbox{estimator} - \mbox{parameter}}{\mbox{standard error}} \sim \mbox{Normal}(0,1),$$
+
+where "standard error" is what we call an estimator of the standard deviation of the estimator.
+
+## Justification
+
+The CLT from the previous section provides a justification for why these $Z$ statistics are approximately $\mbox{Normal}(0,1)$.
+
+Some additional mathematics and assumptions must be detailed, but the basic justification is through the CLT.
+
+## Summary of Statistics
+
+| Distribution |  Estimator  |  Std Err  |  $Z$ Statistic  |
+| ------------ | :---------: | :-------: | :-------------: |
+| Binomial$(n,p)$ | $\hat{p} = X/n$ | $\sqrt{\frac{\hat{p}(1-\hat{p})}{n}}$ | $\frac{\hat{p} - p}{\sqrt{\frac{\hat{p}(1-\hat{p})}{n}}}$ |
+| Normal$(\mu, \sigma^2)$ | $\hat{\mu} = \overline{X}$ | $\frac{S}{\sqrt{n}}$ | $\frac{\hat{\mu} - \mu}{S/\sqrt{n}}$ |
+| Poisson$(\lambda)$ | $\hat{\lambda} = \overline{X}$ | $\sqrt{\frac{\hat{\lambda}}{n}}$ | $\frac{\hat{\lambda} - \lambda}{\sqrt{\hat{\lambda}/n}}$ |
+
+In all of these scenarios, $Z$ is approximately Normal$(0,1)$ for large $n$.
+
+## Notes
+
+- For the Normal and Poisson distributions, our model is $X_1, X_2, \ldots, X_n$ iid from each respective distribution
+- For the Binomial distribution, our model is $X \sim \mbox{Binomial}(n, p)$   
+- In the Normal model, $S = \sqrt{\frac{\sum_{i=1}^n (X_i - \overline{X})^2}{n-1}}$ is the sample standard deviation
+- The above formulas were given in terms of the random variable probability models; on observed data the same formulas are used except we observed data lower case letters, e.g., replace $\overline{X}$ with $\overline{x}$
+
+## Binomial
+
+Approximate $(1-\alpha)$-level two-sided CI:
+
+$$\left(\hat{p} - |z_{\alpha/2}| \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}, \hat{p} + |z_{\alpha/2}| \sqrt{\frac{\hat{p}(1-\hat{p})}{n}} \right)$$
+
+Hypothesis test, $H_0: p=p_0$ vs $H_1: p \not= p_0$:
+
+$$z = \frac{\hat{p} - p_0}{\sqrt{\frac{\hat{p}(1-\hat{p})}{n}}} \mbox{ and } \mbox{p-value} = {\rm Pr}(|Z^*| \geq |z|)$$
+
+where $Z^*$ is a Normal$(0,1)$ random variable.
+
+## Normal
+
+Approximate $(1-\alpha)$-level two-sided CI:
+
+$$\left(\hat{\mu} - |z_{\alpha/2}| \frac{s}{\sqrt{n}}, \hat{\mu} + |z_{\alpha/2}| \frac{s}{\sqrt{n}} \right)$$
+
+Hypothesis test, $H_0: \mu=\mu_0$ vs $H_1: \mu \not= \mu_0$:
+
+$$z = \frac{\hat{\mu} - \mu_0}{s/\sqrt{n}} \mbox{ and } \mbox{p-value} = {\rm Pr}(|Z^*| \geq |z|)$$
+
+where $Z^*$ is a Normal$(0,1)$ random variable.
+
+## Poisson
+
+Approximate $(1-\alpha)$-level two-sided CI:
+
+$$\left(\hat{\lambda} - |z_{\alpha/2}| \sqrt{\frac{\hat{\lambda}}{n}}, \hat{\lambda} + |z_{\alpha/2}| \sqrt{\frac{\hat{\lambda}}{n}} \right)$$
+
+Hypothesis test, $H_0: \lambda=\lambda_0$ vs $H_1: \lambda \not= \lambda_0$:
+
+$$z = \frac{\hat{\lambda} - \lambda_0}{\sqrt{\frac{\hat{\lambda}}{n}}} \mbox{ and } \mbox{p-value} = {\rm Pr}(|Z^*| \geq |z|)$$
+
+where $Z^*$ is a Normal$(0,1)$ random variable.
+
+## Two-Sided CIs and HTs
+
+The two-sided versions of these approximate confidence intervals and hypothesis tests work analogously.
+
+The procedures shown for the $\mbox{Normal}(\mu, \sigma^2)$ case with known $\sigma^2$ from last week are utilzied with the appropriate subsitutions as in the above examples. 
+
+## Comment
+
+This gives you a framework to do many common inference tasks "by hand" (i.e., calculating each component directly in R).
+
+However, R uses a much more comprehensive set of theory, methods, and computational approximations.
+
+Therefore, this "large $n$, $z$-statistic" framework serves as a guide so that you know approximately what R does, but we will learn specific functions that are tailored for each data type.
+
+# Two-Sample Inference
+
+## Comparing Two Populations
+
+So far we have concentrated on analyzing $n$ observations from a single population.
+
+However, suppose that we want to do inference to compare two populations?
+
+The framework we have described so far is easily extended to accommodate this.
+
+## Two RVs
+
+If $X$ and $Y$ are independent rv's then:
+
+$${\rm E}[X - Y] = {\rm E}[X] - {\rm E}[Y]$$
+
+$${\rm Var}(X-Y) =  {\rm Var}(X) + {\rm Var}(Y)$$
+
+## Two Sample Means
+
+Let $X_1, X_2, \ldots, X_{n_1}$ be iid rv's with population mean $\mu_1$ and population variance $\sigma^2_1$.
+
+Let $Y_1, Y_2, \ldots, Y_{n_2}$ be iid rv's with population mean $\mu_2$ and population variance $\sigma^2_2$.
+
+Assume that the two sets of rv's are independent.  Then when the CLT applies to each set of rv's, it approximately holds that:
+
+$$  \frac{\overline{X} - \overline{Y} - (\mu_1 - \mu_2)}{\sqrt{\frac{\sigma^2_1}{n_1} + \frac{\sigma^2_2}{n_2}}} \sim \mbox{Normal}(0,1)$$
+
+## Same Rationale
+
+Just as we formed $Z$-statistics earlier of the form
+
+$$Z = \frac{\mbox{estimator} - \mbox{parameter}}{\mbox{standard error}} \stackrel{\cdot}{\sim} \mbox{Normal}(0,1),$$
+
+we can do the analogous thing in the two-sample case, except now we're considering differences.
+
+## Poisson
+
+Let $X_1, X_2, \ldots, X_{n_1}$ be iid $\mbox{Poisson}(\lambda_1)$ and $Y_1, Y_2, \ldots, Y_{n_2}$ be iid $\mbox{Poisson}(\lambda_2)$.
+
+We have $\hat{\lambda}_1 = \overline{X}$ and $\hat{\lambda}_2 = \overline{Y}$.  For large $n_1$ and $n_2$, it approximately holds that:
+
+$$ 
+\frac{\hat{\lambda}_1 - \hat{\lambda}_2 - (\lambda_1 - \lambda_2)}{\sqrt{\frac{\lambda_1}{n_1} + \frac{\lambda_2}{n_2}}} \sim \mbox{Normal}(0,1).
+$$
+
+## Normal (Unequal Variances)
+
+Let $X_1, X_2, \ldots, X_{n_1}$ be iid $\mbox{Normal}(\mu_1, \sigma^2_1)$ and $Y_1, Y_2, \ldots, Y_{n_2}$ be iid $\mbox{Normal}(\mu_2, \sigma^2_2)$.
+
+We have $\hat{\mu}_1 = \overline{X}$ and $\hat{\mu}_2 = \overline{Y}$.  For large $n_1$ and $n_2$, it approximately holds that:
+
+$$ 
+\frac{\hat{\mu}_1 - \hat{\mu}_2 - (\mu_1 - \mu_2)}{\sqrt{\frac{S^2_1}{n_1} + \frac{S^2_2}{n_2}}} \sim \mbox{Normal}(0,1).
+$$
+
+## Normal (Equal Variances)
+
+Let $X_1, X_2, \ldots, X_{n_1}$ be iid $\mbox{Normal}(\mu_1, \sigma^2)$ and $Y_1, Y_2, \ldots, Y_{n_2}$ be iid $\mbox{Normal}(\mu_2, \sigma^2)$.
+
+We have $\hat{\mu}_1 = \overline{X}$ and $\hat{\mu}_2 = \overline{Y}$.  For large $n_1$ and $n_2$, it approximately holds that:
+
+$$ 
+\frac{\hat{\mu}_1 - \hat{\mu}_2 - (\mu_1 - \mu_2)}{\sqrt{\frac{S^2}{n_1} + \frac{S^2}{n_2}}} \sim \mbox{Normal}(0,1)
+$$
+
+where
+
+$$
+S^2 = \frac{\sum_{i=1}^{n_1}(X_i - \overline{X})^2 + \sum_{i=1}^{n_2}(Y_i - \overline{Y})^2}{n_1 + n_2 - 2}
+$$
+
+## Binomial
+
+Let $X \sim \mbox{Binomial}(n_1, p_1)$ and $Y \sim \mbox{Binomial}(n_2, p_2)$.
+
+We have $\hat{p}_1 = X/n_1$ and $\hat{p}_2 = Y/n_2$.  For large $n_1$ and $n_2$, it approximately holds that:
+
+$$ 
+\frac{\hat{p}_1 - \hat{p}_2 - (p_1 - p_2)}{\sqrt{\frac{\hat{p}_1(1-\hat{p}_1)}{n_1} + \frac{\hat{p}_2(1-\hat{p}_2)}{n_2}}} \sim \mbox{Normal}(0,1).
+$$
+
+## Example: Binomial CI
+
+A 95% CI for the difference $p_1 - p_2$ can be obtained by unfolding the above pivotal statistic:
+
+$$\left((\hat{p}_1 - \hat{p}_2) - 1.96 \sqrt{\frac{\hat{p}_1(1-\hat{p}_1)}{n_1} + \frac{\hat{p}_2(1-\hat{p}_2)}{n_2}} \right.,$$
+
+$$\left. (\hat{p}_1 - \hat{p}_2) + 1.96 \sqrt{\frac{\hat{p}_1(1-\hat{p}_1)}{n_1} + \frac{\hat{p}_2(1-\hat{p}_2)}{n_2}} \right)$$
+
+## Example: Binomial HT
+
+Suppose we wish to test $H_0: p_1 = p_2$ vs $H_1: p_1 \not= p_2$.
+
+First form the $z$-statistic:
+
+$$ 
+z = \frac{\hat{p}_1 - \hat{p}_2 }{\sqrt{\frac{\hat{p}_1(1-\hat{p}_1)}{n_1} + \frac{\hat{p}_2(1-\hat{p}_2)}{n_2}}}.
+$$
+
+Now, calculate the p-value:
+
+$$
+{\rm Pr}(|Z^*| \geq |z|)
+$$
+
+where $Z^*$ is a Normal(0,1) random variable.
+
+# *Z* Statistic Inference in R
+
+## `BSDA` Package
+
+```{r, eval=FALSE}
+install.packages("BSDA")
+```
+
+```{r, message=FALSE}
+library(BSDA)
+str(z.test)
+```
+
+## Example: Poisson
+
+Apply `z.test()`:
+
+```{r}
+n <- 40
+lam <- 14
+x <- rpois(n=n, lambda=lam)
+lam.hat <- mean(x)
+stddev <- sqrt(lam.hat)
+z.test(x=x, sigma.x=stddev, mu=lam)
+```
+
+## By Hand Calculations
+
+Confidence interval:
+
+```{r}
+lam.hat <- mean(x)
+stderr <- sqrt(lam.hat)/sqrt(n)
+lam.hat - abs(qnorm(0.025)) * stderr # lower bound
+lam.hat + abs(qnorm(0.025)) * stderr # upper bound
+```
+
+Hypothesis test:
+
+```{r}
+z <- (lam.hat - lam)/stderr
+z # test statistic
+2 * pnorm(-abs(z)) # two-sided p-value
+```
+
+## Exercise
+
+Figure out how to get the `z.test()` function to work on Binomial data.
+
+Hint:  Are $n$ iid observations from the $\mbox{Binomial}(1, p)$ distribution equivalent to one observation from the $\mbox{Binomial}(n, p)$?
+
+# The *t* Distribution
+
+## Normal Distribution, Unknown Variance
+
+Suppose data a sample of $n$ data points is modeled by $X_1, X_2, \ldots, X_n$ iid $\mbox{Normal}(\mu, \sigma^2)$ where $\sigma^2$ is *unknown*.
+
+We still have a pivotal statistic.  Recall that $S = \sqrt{\frac{\sum_{i=1}^n (X_i - \overline{X})^2}{n-1}}$ is the sample standard deviation.
+
+The statistic
+$$\frac{\overline{X} - \mu}{S/\sqrt{n}}$$
+
+has a $t_{n-1}$ distribution, a *t*-distribution with $n-1$ degrees of freedom.
+
+## *t* vs Normal
+
+```{r, echo=FALSE, fig.height=6.5, fig.width=9}
+x <- seq(-3,3,0.01)
+k <- length(x)
+y <- c(dt(x, df=4), dt(x, df=30), dnorm(x))
+df <- data.frame(x=c(x, x, x), y=y, distribution=c(rep("t, df=4", k), rep("t, df=30", k), rep("Normal", k)))
+ggplot(data=df) + 
+  geom_line(aes(x=x, y=y, color=distribution), size=1.2) +
+  labs(x="x", y="f(x)")
+```
+
+## *t* Percentiles
+
+We calculated percentiles of the Normal(0,1) distribution (e.g., $z_\alpha$).  We can do the analogous calculation with the *t* distribution.
+
+Let $t_\alpha$ be the $\alpha$ percentile of the *t* distribution. Examples:
+
+```{r}
+qt(0.025, df=4) # alpha = 0.025
+qt(0.05, df=4)
+qt(0.95, df=4)
+qt(0.975, df=4)
+```
+
+## Confidence Intervals
+
+Here is a $(1-\alpha)$-level CI for $\mu$ using this distribution:
+
+$$
+\left(\hat{\mu} - |t_{\alpha/2}| \frac{s}{\sqrt{n}}, \hat{\mu} + |t_{\alpha/2}| \frac{s}{\sqrt{n}} \right), 
+$$
+
+where as before $\hat{\mu} = \overline{x}$. This produces a wider CI than the $z$ statistic analogue.
+
+## Hypothesis Tests
+
+Suppose we want to test $H_0: \mu = \mu_0$ vs $H_1: \mu \not= \mu_0$ where $\mu_0$ is a known, given number.
+
+The *t*-statistic is
+
+$$
+t = \frac{\hat{\mu} - \mu_0}{\frac{s}{\sqrt{n}}}
+$$
+
+with p-value
+
+$$
+{\rm Pr}(|T^*| \geq |t|)
+$$
+
+where $T^* \sim t_{n-1}$.
+
+## Two-Sample Inference
+
+In the **Two-Sample Inference** section we presented pivotal statistics for the two-sample case with unequal and equal variances.
+
+When there are equal variances, the pivotal statistic follows a $t_{n_1 + n_2 -2}$ distribution.
+
+When there are unequal variances, the pivotal statistic follows a *t* distribution where the degrees of freedom comes from a more complex formula, which R calculates for us. 
+
+## When Is *t* Utilized?
+
+- The *t* distribution and its corresponding CI's and HT's are utilized when the data are Normal (or approximately Normal) and $n$ is small  
+- Small typically means that $n < 30$  
+- In this case the inference based on the *t* distribution will be more accurate 
+- When $n \geq 30$, there is very little difference between using $t$-statistics and $z$-statistics
+
+# Inference in R
+
+## Functions in R
+
+R has the following functions for doing inference on the distributions we've considered.
+
+- Normal: `t.test()`
+- Binomial: `binomial.test()` or `prop.test()`
+- Poisson: `poisson.test()`
+
+These perform one-sample and two-sample hypothesis testing and confidence interval construction for both the one-sided and two-sided cases.
+
+## About These Functions
+
+- We covered a convenient, unified framework that allows us to better understand how confidence intervals and hypothesis testing are performed
+
+- However, this framework requires large sample sizes and is not necessarily the best method to apply in all circumstances
+
+## About These Functions (cont'd)
+
+- The above R functions are versatile functions for analyzing Normal, Binomial, and Poisson distributed data (or approximations thereof) that use much broader theory and methods than we will cover in this course
+
+- The arguments these functions take and the ouput of the functions are in line with the framework that we have covered
+
+# Inference on Normal Data in R
+
+## Setup
+
+```{r, message=FALSE}
+library("dplyr")
+library("ggplot2")
+theme_set(theme_bw())
+library("broom")
+```
+
+## "Davis" Data Set
+
+```{r}
+library("car")
+data("Davis")
+```
+
+```{r}
+htwt <- tbl_df(Davis)
+htwt
+```
+
+## Height vs Weight
+
+```{r}
+ggplot(htwt) + 
+geom_point(aes(x=height, y=weight, color=sex), size=2, alpha=0.5) +
+scale_colour_manual(values=c("red", "blue"))
+```
+
+## An Error?
+
+```{r}
+which(htwt$height < 100)
+htwt[12,]
+```
+```{r}
+htwt[12,c(2,3)] <- htwt[12,c(3,2)]
+```
+
+## Updated Height vs Weight
+
+```{r}
+ggplot(htwt) + 
+  geom_point(aes(x=height, y=weight, color=sex), size=2, alpha=0.5) +
+  scale_color_manual(values=c("red", "blue"))
+```
+
+## Density Plots of Height
+
+```{r}
+ggplot(htwt) + 
+  geom_density(aes(x=height, color=sex), size=1.5) + 
+  scale_color_manual(values=c("red", "blue"))
+```
+
+## Density Plots of Weight
+
+```{r}
+ggplot(htwt) + 
+  geom_density(aes(x=weight, color=sex), size=1.5) + 
+  scale_color_manual(values=c("red", "blue"))
+```
+
+## `t.test()` Function
+
+From the help file...
+
+```
+Usage
+
+t.test(x, ...)
+
+## Default S3 method:
+t.test(x, y = NULL,
+       alternative = c("two.sided", "less", "greater"),
+       mu = 0, paired = FALSE, var.equal = FALSE,
+       conf.level = 0.95, ...)
+
+## S3 method for class 'formula'
+t.test(formula, data, subset, na.action, ...)
+```
+
+## Two-Sided Test of Male Height
+
+```{r}
+m_ht <- htwt %>% filter(sex=="M") %>% select(height)
+testresult <- t.test(x = m_ht$height, mu=177)
+```
+
+```{r}
+class(testresult)
+is.list(testresult)
+```
+
+## Output of `t.test()`
+
+```{r}
+names(testresult)
+testresult
+```
+
+## Tidying the Output
+
+```{r}
+library(broom)
+tidy(testresult)
+```
+
+## Two-Sided Test of Female Height
+
+```{r}
+f_ht <- htwt %>% filter(sex=="F") %>% select(height)
+t.test(x = f_ht$height, mu = 164)
+```
+
+## Difference of Two Means
+
+```{r}
+t.test(x = m_ht$height, y = f_ht$height)
+```
+
+## Test with Equal Variances
+
+```{r}
+htwt %>% group_by(sex) %>% summarize(sd(height))
+t.test(x = m_ht$height, y = f_ht$height, var.equal = TRUE)
+```
+
+## Paired Sample Test (v. 1)
+
+```{r}
+htwt <- htwt %>% mutate(diffwt = (weight - repwt), diffht = (height - repht))
+t.test(x = htwt$diffwt) %>% tidy()
+t.test(x = htwt$diffht) %>% tidy()
+```
+
+## Paired Sample Test (v. 2)
+
+```{r}
+t.test(x=htwt$weight, y=htwt$repwt, paired=TRUE) %>% tidy()
+t.test(x=htwt$height, y=htwt$repht, paired=TRUE) %>% tidy()
+htwt %>% select(height, repht) %>% na.omit() %>% summarize(mean(height), mean(repht))
+```
+
+# Inference on Binomial Data in R
+
+## The Coin Flip Example
+
+I flip it 20 times and it lands on heads 16 times.
+
+1. My data is $x=16$ heads out of $n=20$ flips.
+2. My data generation model is $X \sim \mbox{Binomial}(20, p)$.
+3. I form the statistic $\hat{p} = 16/20$ as an estimate of $p$.
+
+Let's do hypothesis testing and confidence interval construction on these data.
+
+## `binom.test()`
+
+```{r}
+str(binom.test)
+binom.test(x=16, n=20, p = 0.5)
+```
+
+## `alternative = "greater"`
+
+Tests $H_0: p \leq 0.5$ vs. $H_1: p > 0.5$.
+
+```{r}
+binom.test(x=16, n=20, p = 0.5, alternative="greater")
+```
+
+## `alternative = "less"`
+
+Tests $H_0: p \geq 0.5$ vs. $H_1: p < 0.5$.
+
+```{r}
+binom.test(x=16, n=20, p = 0.5, alternative="less")
+```
+
+## `prop.test()`
+
+This is a "large $n$" inference method that is very similar to our $z$-statistic approach.
+
+```{r}
+str(prop.test)
+prop.test(x=16, n=20, p=0.5)
+```
+
+## An Observation
+
+```{r}
+p <- binom.test(x=16, n=20, p = 0.5)$p.value
+binom.test(x=16, n=20, p = 0.5, conf.level=(1-p))
+```
+
+Exercise: Figure out what happened here.
+
+## *OIS* Exercise 6.10
+
+The way a question is phrased can influence a person’s response. For example, Pew Research Center conducted a survey with the following question:
+
+"As you may know, by 2014 nearly all Americans will be required to have health insurance. [People who do not buy insurance will pay a penalty] while [People who cannot afford it will receive financial help from the government]. Do you approve or disapprove of this policy?"
+
+For each randomly sampled respondent, the statements in brackets were randomized: either they were kept in the order given above, or the two statements were reversed. 
+
+## The Data
+
+Table 6.2 shows the results of this experiment, reproduced below. 
+
+2nd Statement | Sample Size | Approve Law | Disapprove Law | Other
+------------- | ----------- | ----------- | -------------- | -----
+"people who cannot afford it will receive financial help from the government" | 771 | 47 | 49 | 3
+"people who do not buy it will pay a penalty" | 732 | 34 | 63 | 3
+
+## Inference on the Difference
+
+Create and interpret a 90% confidence interval of the difference in approval. Also perform a hyppthesis test that the approval rates are equal.
+
+```{r}
+x <- round(c(0.47*771, 0.34*732))
+n <- round(c(771*0.97, 732*0.97))
+prop.test(x=x, n=n, conf.level=0.90)
+```
+
+## *OIS* 90% CI
+
+The book *OIS* does a "by hand" calculation using the $z$-statistics and comes up with a similar answer (but not identical).
+
+```{r}
+p1.hat <- 0.47
+n1 <- 771
+p2.hat <- 0.34
+n2 <- 732
+stderr <- sqrt(p1.hat*(1-p1.hat)/n1 + p2.hat*(1-p2.hat)/n2)
+
+# the 90% CI
+(p1.hat - p2.hat) + c(-1,1)*abs(qnorm(0.05))*stderr
+```
+
+# Inference on Poisson Data in R
+
+## `poisson.test()`
+
+```{r}
+str(poisson.test)
+```
+
+From the help:
+```
+Arguments
+
+x	 number of events. A vector of length one or two.
+
+T	 time base for event count. A vector of length one or two.
+
+r	 hypothesized rate or rate ratio
+
+alternative  indicates the alternative hypothesis and must be one of 
+"two.sided", "greater" or "less". You can specify just the initial letter.
+
+conf.level  confidence level for the returned confidence interval.
+```
+
+## Example: RNA-Seq
+
+RNA-Seq gene expression was measured for p53 lung tissue in 12 healthy individuals and 14 individuals with lung cancer.
+
+The counts were given as follows.
+
+Healthy: 82 64 66 88 65 81 85 87 60 79 80 72
+
+Cancer: 59 50 60 60 78 69 70 67 72 66 66 68 54 62
+
+It is hypothesized that p53 expression is higher in healthy individuals.  Test this hypothesis, and form a 99% CI.
+
+## $H_1: \lambda_1 \not= \lambda_2$
+
+```{r}
+healthy <- c(82, 64, 66, 88, 65, 81, 85, 87, 60, 79, 80, 72)
+cancer <- c(59, 50, 60, 60, 78, 69, 70, 67, 72, 66, 66, 68, 
+            54, 62)
+```
+
+```{r}
+poisson.test(x=c(sum(healthy), sum(cancer)), T=c(12,14), 
+             conf.level=0.99)
+```
+
+## $H_1: \lambda_1 < \lambda_2$
+
+```{r}
+poisson.test(x=c(sum(healthy), sum(cancer)), T=c(12,14), 
+             alternative="less", conf.level=0.99)
+```
+
+## $H_1: \lambda_1 > \lambda_2$
+
+```{r}
+poisson.test(x=c(sum(healthy), sum(cancer)), T=c(12,14), 
+             alternative="greater", conf.level=0.99)
+```
+
+## Question
+
+Which analysis is the more informative and scientifically correct one, and why?
+
+# Extras
+
+## License
+
+<https://github.com/SML201/lectures/blob/master/LICENSE.md>
+
+## Source Code
+
+<https://github.com/SML201/lectures/tree/master/week8>
+
+## Session Information
+
+<section style="font-size: 0.75em;">
+```{r}
+sessionInfo()
+```
+</section>
+
