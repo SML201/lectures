@@ -218,9 +218,9 @@ p {
 <p>Hypothesis test, <span class="math inline">\(H_0: \lambda=\lambda_0\)</span> vs <span class="math inline">\(H_1: \lambda \not= \lambda_0\)</span>:</p>
 <p><span class="math display">\[z = \frac{\hat{\lambda} - \lambda_0}{\sqrt{\frac{\hat{\lambda}}{n}}} \mbox{ and } \mbox{p-value} = {\rm Pr}(|Z^*| \geq |z|)\]</span></p>
 <p>where <span class="math inline">\(Z^*\)</span> is a Normal<span class="math inline">\((0,1)\)</span> random variable.</p>
-</section><section id="two-sided-cis-and-hts" class="slide level2">
-<h1>Two-Sided CIs and HTs</h1>
-<p>The two-sided versions of these approximate confidence intervals and hypothesis tests work analogously.</p>
+</section><section id="one-sided-cis-and-hts" class="slide level2">
+<h1>One-Sided CIs and HTs</h1>
+<p>The one-sided versions of these approximate confidence intervals and hypothesis tests work analogously.</p>
 <p>The procedures shown for the <span class="math inline">\(\mbox{Normal}(\mu, \sigma^2)\)</span> case with known <span class="math inline">\(\sigma^2\)</span> from last week are utilzied with the appropriate subsitutions as in the above examples.</p>
 </section><section id="comment" class="slide level2">
 <h1>Comment</h1>
@@ -254,7 +254,7 @@ p {
 <p>Let <span class="math inline">\(X_1, X_2, \ldots, X_{n_1}\)</span> be iid <span class="math inline">\(\mbox{Poisson}(\lambda_1)\)</span> and <span class="math inline">\(Y_1, Y_2, \ldots, Y_{n_2}\)</span> be iid <span class="math inline">\(\mbox{Poisson}(\lambda_2)\)</span>.</p>
 <p>We have <span class="math inline">\(\hat{\lambda}_1 = \overline{X}\)</span> and <span class="math inline">\(\hat{\lambda}_2 = \overline{Y}\)</span>. For large <span class="math inline">\(n_1\)</span> and <span class="math inline">\(n_2\)</span>, it approximately holds that:</p>
 <p><span class="math display">\[ 
-\frac{\hat{\lambda}_1 - \hat{\lambda}_2 - (\lambda_1 - \lambda_2)}{\sqrt{\frac{\lambda_1}{n_1} + \frac{\lambda_2}{n_2}}} \sim \mbox{Normal}(0,1).
+\frac{\hat{\lambda}_1 - \hat{\lambda}_2 - (\lambda_1 - \lambda_2)}{\sqrt{\frac{\hat{\lambda}_1}{n_1} + \frac{\hat{\lambda}_2}{n_2}}} \sim \mbox{Normal}(0,1).
 \]</span></p>
 </section><section id="normal-unequal-variances" class="slide level2">
 <h1>Normal (Unequal Variances)</h1>
@@ -309,6 +309,7 @@ function (x, y = NULL, alternative = &quot;two.sided&quot;, mu = 0,
 </section><section id="example-poisson" class="slide level2">
 <h1>Example: Poisson</h1>
 <p>Apply <code>z.test()</code>:</p>
+<pre class="r"><code>&gt; set.seed(210)</code></pre>
 <pre class="r"><code>&gt; n &lt;- 40
 &gt; lam &lt;- 14
 &gt; x &lt;- rpois(n=n, lambda=lam)
@@ -319,28 +320,30 @@ function (x, y = NULL, alternative = &quot;two.sided&quot;, mu = 0,
     One-sample z-Test
 
 data:  x
-z = 0.95256, p-value = 0.3408
+z = 0.41885, p-value = 0.6753
 alternative hypothesis: true mean is not equal to 14
 95 percent confidence interval:
- 13.3919 15.7581
+ 13.08016 15.41984
 sample estimates:
 mean of x 
-   14.575 </code></pre>
+    14.25 </code></pre>
 </section><section id="by-hand-calculations" class="slide level2">
 <h1>By Hand Calculations</h1>
 <p>Confidence interval:</p>
 <pre class="r"><code>&gt; lam.hat &lt;- mean(x)
+&gt; lam.hat
+[1] 14.25
 &gt; stderr &lt;- sqrt(lam.hat)/sqrt(n)
 &gt; lam.hat - abs(qnorm(0.025)) * stderr # lower bound
-[1] 13.3919
+[1] 13.08016
 &gt; lam.hat + abs(qnorm(0.025)) * stderr # upper bound
-[1] 15.7581</code></pre>
+[1] 15.41984</code></pre>
 <p>Hypothesis test:</p>
 <pre class="r"><code>&gt; z &lt;- (lam.hat - lam)/stderr
 &gt; z # test statistic
-[1] 0.9525627
+[1] 0.4188539
 &gt; 2 * pnorm(-abs(z)) # two-sided p-value
-[1] 0.3408117</code></pre>
+[1] 0.6753229</code></pre>
 </section><section id="exercise" class="slide level2">
 <h1>Exercise</h1>
 <p>Figure out how to get the <code>z.test()</code> function to work on Binomial data.</p>
@@ -590,7 +593,9 @@ mean of x mean of y
  178.0114  164.7143 </code></pre>
 </section><section id="paired-sample-test-v.-1" class="slide level2">
 <h1>Paired Sample Test (v. 1)</h1>
-<pre class="r"><code>&gt; htwt &lt;- htwt %&gt;% mutate(diffwt = (weight - repwt), diffht = (height - repht))
+<p>First take the difference between the paired observations. Then apply the one-sample t-test.</p>
+<pre class="r"><code>&gt; htwt &lt;- htwt %&gt;% mutate(diffwt = (weight - repwt), 
++                         diffht = (height - repht))
 &gt; t.test(x = htwt$diffwt) %&gt;% tidy()
      estimate statistic   p.value parameter   conf.low
 1 0.005464481 0.0319381 0.9745564       182 -0.3321223
@@ -601,6 +606,7 @@ mean of x mean of y
 1 2.076503  13.52629 2.636736e-29       182 1.773603  2.379403</code></pre>
 </section><section id="paired-sample-test-v.-2" class="slide level2">
 <h1>Paired Sample Test (v. 2)</h1>
+<p>Enter each sample into the <code>t.test()</code> function, but use the <code>paired=TRUE</code> argument. This is operationally equivalent to the previous version.</p>
 <pre class="r"><code>&gt; t.test(x=htwt$weight, y=htwt$repwt, paired=TRUE) %&gt;% tidy()
      estimate statistic   p.value parameter   conf.low
 1 0.005464481 0.0319381 0.9745564       182 -0.3321223
@@ -609,7 +615,8 @@ mean of x mean of y
 &gt; t.test(x=htwt$height, y=htwt$repht, paired=TRUE) %&gt;% tidy()
   estimate statistic      p.value parameter conf.low conf.high
 1 2.076503  13.52629 2.636736e-29       182 1.773603  2.379403
-&gt; htwt %&gt;% select(height, repht) %&gt;% na.omit() %&gt;% summarize(mean(height), mean(repht))
+&gt; htwt %&gt;% select(height, repht) %&gt;% na.omit() %&gt;% 
++   summarize(mean(height), mean(repht))
 Source: local data frame [1 x 2]
 
   mean(height) mean(repht)
@@ -797,7 +804,8 @@ T    time base for event count. A vector of length one or two.
 
 r    hypothesized rate or rate ratio
 
-alternative  indicates the alternative hypothesis and must be one of &quot;two.sided&quot;, &quot;greater&quot; or &quot;less&quot;. You can specify just the initial letter.
+alternative  indicates the alternative hypothesis and must be one of 
+&quot;two.sided&quot;, &quot;greater&quot; or &quot;less&quot;. You can specify just the initial letter.
 
 conf.level  confidence level for the returned confidence interval.</code></pre>
 </section><section id="example-rna-seq" class="slide level2">

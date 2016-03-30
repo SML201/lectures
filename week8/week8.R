@@ -32,6 +32,9 @@ ggplot(data=df) +
 library(BSDA)
 str(z.test)
 
+## ---- display=FALSE------------------------------------------------------
+set.seed(210)
+
 ## ------------------------------------------------------------------------
 n <- 40
 lam <- 14
@@ -42,6 +45,7 @@ z.test(x=x, sigma.x=stddev, mu=lam)
 
 ## ------------------------------------------------------------------------
 lam.hat <- mean(x)
+lam.hat
 stderr <- sqrt(lam.hat)/sqrt(n)
 lam.hat - abs(qnorm(0.025)) * stderr # lower bound
 lam.hat + abs(qnorm(0.025)) * stderr # upper bound
@@ -135,14 +139,16 @@ htwt %>% group_by(sex) %>% summarize(sd(height))
 t.test(x = m_ht$height, y = f_ht$height, var.equal = TRUE)
 
 ## ------------------------------------------------------------------------
-htwt <- htwt %>% mutate(diffwt = (weight - repwt), diffht = (height - repht))
+htwt <- htwt %>% mutate(diffwt = (weight - repwt), 
+                        diffht = (height - repht))
 t.test(x = htwt$diffwt) %>% tidy()
 t.test(x = htwt$diffht) %>% tidy()
 
 ## ------------------------------------------------------------------------
 t.test(x=htwt$weight, y=htwt$repwt, paired=TRUE) %>% tidy()
 t.test(x=htwt$height, y=htwt$repht, paired=TRUE) %>% tidy()
-htwt %>% select(height, repht) %>% na.omit() %>% summarize(mean(height), mean(repht))
+htwt %>% select(height, repht) %>% na.omit() %>% 
+  summarize(mean(height), mean(repht))
 
 ## ------------------------------------------------------------------------
 str(binom.test)

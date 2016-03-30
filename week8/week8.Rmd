@@ -158,9 +158,9 @@ $$z = \frac{\hat{\lambda} - \lambda_0}{\sqrt{\frac{\hat{\lambda}}{n}}} \mbox{ an
 
 where $Z^*$ is a Normal$(0,1)$ random variable.
 
-## Two-Sided CIs and HTs
+## One-Sided CIs and HTs
 
-The two-sided versions of these approximate confidence intervals and hypothesis tests work analogously.
+The one-sided versions of these approximate confidence intervals and hypothesis tests work analogously.
 
 The procedures shown for the $\mbox{Normal}(\mu, \sigma^2)$ case with known $\sigma^2$ from last week are utilzied with the appropriate subsitutions as in the above examples. 
 
@@ -215,7 +215,7 @@ Let $X_1, X_2, \ldots, X_{n_1}$ be iid $\mbox{Poisson}(\lambda_1)$ and $Y_1, Y_2
 We have $\hat{\lambda}_1 = \overline{X}$ and $\hat{\lambda}_2 = \overline{Y}$.  For large $n_1$ and $n_2$, it approximately holds that:
 
 $$ 
-\frac{\hat{\lambda}_1 - \hat{\lambda}_2 - (\lambda_1 - \lambda_2)}{\sqrt{\frac{\lambda_1}{n_1} + \frac{\lambda_2}{n_2}}} \sim \mbox{Normal}(0,1).
+\frac{\hat{\lambda}_1 - \hat{\lambda}_2 - (\lambda_1 - \lambda_2)}{\sqrt{\frac{\hat{\lambda}_1}{n_1} + \frac{\hat{\lambda}_2}{n_2}}} \sim \mbox{Normal}(0,1).
 $$
 
 ## Normal (Unequal Variances)
@@ -297,6 +297,10 @@ str(z.test)
 
 Apply `z.test()`:
 
+```{r, display=FALSE}
+set.seed(210)
+```
+
 ```{r}
 n <- 40
 lam <- 14
@@ -312,6 +316,7 @@ Confidence interval:
 
 ```{r}
 lam.hat <- mean(x)
+lam.hat
 stderr <- sqrt(lam.hat)/sqrt(n)
 lam.hat - abs(qnorm(0.025)) * stderr # lower bound
 lam.hat + abs(qnorm(0.025)) * stderr # upper bound
@@ -568,18 +573,24 @@ t.test(x = m_ht$height, y = f_ht$height, var.equal = TRUE)
 
 ## Paired Sample Test (v. 1)
 
+First take the difference between the paired observations. Then apply the one-sample t-test.
+
 ```{r}
-htwt <- htwt %>% mutate(diffwt = (weight - repwt), diffht = (height - repht))
+htwt <- htwt %>% mutate(diffwt = (weight - repwt), 
+                        diffht = (height - repht))
 t.test(x = htwt$diffwt) %>% tidy()
 t.test(x = htwt$diffht) %>% tidy()
 ```
 
 ## Paired Sample Test (v. 2)
 
+Enter each sample into the `t.test()` function, but use the `paired=TRUE` argument. This is operationally equivalent to the previous version.
+
 ```{r}
 t.test(x=htwt$weight, y=htwt$repwt, paired=TRUE) %>% tidy()
 t.test(x=htwt$height, y=htwt$repht, paired=TRUE) %>% tidy()
-htwt %>% select(height, repht) %>% na.omit() %>% summarize(mean(height), mean(repht))
+htwt %>% select(height, repht) %>% na.omit() %>% 
+  summarize(mean(height), mean(repht))
 ```
 
 # Inference on Binomial Data in R
@@ -637,7 +648,7 @@ Exercise: Figure out what happened here.
 
 ## *OIS* Exercise 6.10
 
-The way a question is phrased can influence a person’s response. For example, Pew Research Center conducted a survey with the following question:
+The way a question is phrased can influence a person's response. For example, Pew Research Center conducted a survey with the following question:
 
 "As you may know, by 2014 nearly all Americans will be required to have health insurance. [People who do not buy insurance will pay a penalty] while [People who cannot afford it will receive financial help from the government]. Do you approve or disapprove of this policy?"
 
