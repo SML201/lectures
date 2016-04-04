@@ -378,7 +378,7 @@ where $s_x$ and $s_y$ are the sample standard deviations of each measured variab
 Suppose there are two random variables $X and $Y$.  Their population correlation is
 
 $$
-\rho_{XY} = \frac{{\rm E}\left[(X-{\rm E}[X])(Y-{\rm E}[Y])\right]}{\sqrt{{\rm Var}(X) {\rm Var}(Y)}}
+\rho_{XY} = \frac{\operatorname{E}\left[(X-{\rm E}[X])(Y-{\rm E}[Y])\right]}{\sqrt{\operatorname{Var}(X) {\rm Var}(Y)}}
 $$
 
 ## Hand Size Vs. Height
