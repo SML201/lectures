@@ -207,6 +207,46 @@ htwt %>% filter(sex=="F") %>%
 htwt %>% filter(sex=="M") %>%  
   cor.test(~ height + weight, data = .)
 
+## ---- echo=FALSE---------------------------------------------------------
+set.seed(201)
+x <- rnorm(50) + 20
+y <- 10 + 2*x + rnorm(50)
+f <- lm(y ~ x)
+
+df <- data.frame(x=x, y=y, f=f$fitted.values, 
+                 lower=pmin(y, f$fitted.values), 
+                 upper=pmax(y, f$fitted.values))
+
+ggplot(df) + 
+  geom_line(aes(x, f), color="blue") + 
+  geom_linerange(aes(x=x, ymin=lower, ymax=upper), color="red") +
+  geom_point(aes(x,y)) +
+  labs(x="x", y="y")
+
+## ------------------------------------------------------------------------
+ggplot(data=htwt, mapping=aes(x=height, y=weight)) + 
+  geom_point(size=2, alpha=0.5) +
+  geom_smooth(method="lm", se=FALSE, formula=y~x)
+
+## ------------------------------------------------------------------------
+beta1 <- cor(htwt$height, htwt$weight) * 
+               sd(htwt$weight) / sd(htwt$height)
+beta1
+
+beta0 <- mean(htwt$weight) - beta1 * mean(htwt$height)
+beta0
+
+yhat <- beta0 + beta1 * htwt$height
+
+## ------------------------------------------------------------------------
+df <- data.frame(htwt, yhat=yhat)
+ggplot(data=df) + geom_point(aes(x=height, y=weight), size=2, alpha=0.5) +
+  geom_line(aes(x=height, y=yhat), color="blue", size=1.2)
+
+## ------------------------------------------------------------------------
+myfit <- lm(weight ~ height, data=htwt)
+myfit
+
 ## ---- eval=FALSE, echo=FALSE---------------------------------------------
 ## # Least Squares Regression
 ## 

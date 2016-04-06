@@ -536,6 +536,107 @@ htwt %>% filter(sex=="M") %>%
 
 Why are the stratified correlations lower?
 
+# Least Squares Linear Regression
+
+## Rationale
+
+- It is often the case that we would like to build a model that explains the variation of one variable in terms of other variables.
+
+- **Least squares linear regression** is one of the simplest and most useful modeling systems for doing so.
+
+- It is simple to fit, it satisfies some optimality criteria, and it is straightforward to check assumptions on the data so that statistical inference can be performed.
+
+## Setup
+
+- Let's start with least squares linear regression of just two variables.  
+
+- Suppose that we have observed $n$ pairs of data $(x_1, y_1), (x_2, y_2), \ldots, (x_n, y_n)$.
+
+- Least squares linear regression models variation of $y_i$ in terms of $\beta_0 + \beta_1 x_i$ where $\beta_0$ and $\beta_1$ are chosen to satisfy a least squares optimization.
+
+## Line that Minimizes the Squared Error
+
+The least squares regression line is formed from the value of $\beta_0$ and $\beta_1$ that minimize:
+
+$$\sum_{i=1}^n \left( y_i - \beta_0 - \beta_1 x_i \right)^2.$$
+
+For a given set of data, there is a unique solution to this minimization as long as there are at least two unique values among $x_1, x_2, \ldots, x_n$.  
+
+Let $\hat{\beta_0}$ and $\hat{\beta_1}$ be the values that minimize this sum of squares.
+
+## Least Squares Solution
+
+These values are:
+
+$$\hat{\beta}_1 = r_{xy} \frac{s_y}{s_x}$$
+
+$$\hat{\beta}_0 = \overline{y} - \hat{\beta}_1 \overline{x}$$
+
+These values have a useful interpretation.
+
+## Visualizing Least Squares Line
+
+```{r, echo=FALSE}
+set.seed(201)
+x <- rnorm(50) + 20
+y <- 10 + 2*x + rnorm(50)
+f <- lm(y ~ x)
+
+df <- data.frame(x=x, y=y, f=f$fitted.values, 
+                 lower=pmin(y, f$fitted.values), 
+                 upper=pmax(y, f$fitted.values))
+
+ggplot(df) + 
+  geom_line(aes(x, f), color="blue") + 
+  geom_linerange(aes(x=x, ymin=lower, ymax=upper), color="red") +
+  geom_point(aes(x,y)) +
+  labs(x="x", y="y")
+```
+
+## Example: Height and Weight
+
+```{r}
+ggplot(data=htwt, mapping=aes(x=height, y=weight)) + 
+  geom_point(size=2, alpha=0.5) +
+  geom_smooth(method="lm", se=FALSE, formula=y~x)
+```
+
+## Calculate the Line by Hand
+
+```{r}
+beta1 <- cor(htwt$height, htwt$weight) * 
+               sd(htwt$weight) / sd(htwt$height)
+beta1
+
+beta0 <- mean(htwt$weight) - beta1 * mean(htwt$height)
+beta0
+
+yhat <- beta0 + beta1 * htwt$height
+```
+
+## Plot the Line
+
+```{r}
+df <- data.frame(htwt, yhat=yhat)
+ggplot(data=df) + geom_point(aes(x=height, y=weight), size=2, alpha=0.5) +
+  geom_line(aes(x=height, y=yhat), color="blue", size=1.2)
+```
+
+## Calculate the Line in R
+
+```{r}
+myfit <- lm(weight ~ height, data=htwt)
+myfit
+```
+
+## What's Next?
+
+- Why minimize the sum of squares?
+- What is the output provided by R? 
+- How do we access and interpret this output from R?
+- What assumptions are required to use this machinery?
+- How do we check these assumptions on data?
+- How can we build more complex models?
 
 ```{r, eval=FALSE, echo=FALSE}
 # Least Squares Regression
