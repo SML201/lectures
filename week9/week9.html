@@ -382,7 +382,7 @@ X-squared
 <ul>
 <li>The total number of observations should be “large” so that …</li>
 <li>The expected number of counts per cell should be 10 or greater</li>
-<li>The observed number of counts per cell shoudl be 5 or greater</li>
+<li>The observed number of counts per cell should be 5 or greater</li>
 </ul>
 <p>When these are violated, continuity corrections and simulation based p-values can be used… or other tests can be used such as Fisher’s Exact Test — see <code>fisher.test()</code>.</p>
 </section><section id="clapping-and-writing-hand" class="slide level2">
@@ -489,7 +489,7 @@ r_{xy} &amp; = &amp; \frac{\sum_{i=1}^n (x_i - \overline{x}) (y_i - \overline{y}
 </ul>
 </section><section id="population-correlation" class="slide level2">
 <h1>Population Correlation</h1>
-<p>Suppose there are two random variables $X and <span class="math inline">\(Y\)</span>. Their population correlation is</p>
+<p>Suppose there are two random variables <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>. Their population correlation is</p>
 <p><span class="math display">\[
 \rho_{XY} = \frac{\operatorname{E}\left[(X-{\rm E}[X])(Y-{\rm E}[Y])\right]}{\sqrt{\operatorname{Var}(X) {\rm Var}(Y)}}
 \]</span></p>
@@ -508,10 +508,10 @@ function (x, y = NULL, use = &quot;everything&quot;, method = c(&quot;pearson&qu
 &gt; cor(survey$Wr.Hnd, survey$Height, 
 +     use=&quot;pairwise.complete.obs&quot;)
 [1] 0.6009909</code></pre>
-<pre class="r"><code>&gt; df &lt;- survey %&gt;% dplyr::select(Wr.Hnd, Height) %&gt;% na.omit()
-&gt; sum((df$Wr.Hnd - mean(df$Wr.Hnd)) *
-+       (df$Height - mean(df$Height))) /
-+   ((nrow(df)-1) * sd(df$Wr.Hnd) * sd(df$Height))
+<pre class="r"><code>&gt; DF &lt;- survey %&gt;% dplyr::select(Wr.Hnd, Height) %&gt;% na.omit()
+&gt; sum((DF$Wr.Hnd - mean(DF$Wr.Hnd)) *
++       (DF$Height - mean(DF$Height))) /
++   ((nrow(DF)-1) * sd(DF$Wr.Hnd) * sd(DF$Height))
 [1] 0.6009909</code></pre>
 </section><section id="example-correlations" class="slide level2">
 <h1>Example Correlations</h1>
@@ -561,13 +561,13 @@ sample estimates:
 &gt; # df &lt;- (survey %&gt;% select(Wr.Hnd, Height) %&gt;% 
 &gt; #        na.omit() %&gt;% nrow())-2 
 &gt; 
-&gt; tstat &lt;- r/sqrt((1 - r^2)*df)
+&gt; tstat &lt;- r/sqrt((1 - r^2)/df)
 &gt; tstat
-[1] 0.05239001
+[1] 10.79234
 &gt; 
 &gt; pvalue &lt;- 2*pt(q=-abs(tstat), df=df)
 &gt; pvalue
-[1] 0.9582687</code></pre>
+[1] 8.227549e-22</code></pre>
 </section><section id="hand-sizes" class="slide level2">
 <h1>Hand Sizes</h1>
 <pre class="r"><code>&gt; ggplot(data = survey) +

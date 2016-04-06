@@ -280,7 +280,7 @@ $$Z = \frac{\mbox{estimator} - \mbox{parameter}}{\mbox{standard error}} \sim \mb
 
 - The total number of observations should be "large" so that ...
 - The expected number of counts per cell should be 10 or greater
-- The observed number of counts per cell shoudl be 5 or greater
+- The observed number of counts per cell should be 5 or greater
 
 When these are violated, continuity corrections and simulation based p-values can be used... or other tests can be used such as Fisher's Exact Test --- see `fisher.test()`.
 
@@ -375,7 +375,7 @@ where $s_x$ and $s_y$ are the sample standard deviations of each measured variab
 
 ## Population Correlation
 
-Suppose there are two random variables $X and $Y$.  Their population correlation is
+Suppose there are two random variables $X$ and $Y$.  Their population correlation is
 
 $$
 \rho_{XY} = \frac{\operatorname{E}\left[(X-{\rm E}[X])(Y-{\rm E}[Y])\right]}{\sqrt{\operatorname{Var}(X) {\rm Var}(Y)}}
@@ -399,10 +399,10 @@ cor(survey$Wr.Hnd, survey$Height,
 ```
 
 ```{r}
-df <- survey %>% dplyr::select(Wr.Hnd, Height) %>% na.omit()
-sum((df$Wr.Hnd - mean(df$Wr.Hnd)) *
-      (df$Height - mean(df$Height))) /
-  ((nrow(df)-1) * sd(df$Wr.Hnd) * sd(df$Height))
+DF <- survey %>% dplyr::select(Wr.Hnd, Height) %>% na.omit()
+sum((DF$Wr.Hnd - mean(DF$Wr.Hnd)) *
+      (DF$Height - mean(DF$Height))) /
+  ((nrow(DF)-1) * sd(DF$Wr.Hnd) * sd(DF$Height))
 ```
 
 ## Example Correlations
@@ -454,7 +454,7 @@ df <- sum(complete.cases(survey[,c("Wr.Hnd", "Height")]))-2
 # df <- (survey %>% select(Wr.Hnd, Height) %>% 
 #        na.omit() %>% nrow())-2 
 
-tstat <- r/sqrt((1 - r^2)*df)
+tstat <- r/sqrt((1 - r^2)/df)
 tstat
 
 pvalue <- 2*pt(q=-abs(tstat), df=df)

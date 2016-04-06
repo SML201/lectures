@@ -144,10 +144,10 @@ cor(survey$Wr.Hnd, survey$Height,
     use="pairwise.complete.obs")
 
 ## ------------------------------------------------------------------------
-df <- survey %>% dplyr::select(Wr.Hnd, Height) %>% na.omit()
-sum((df$Wr.Hnd - mean(df$Wr.Hnd)) *
-      (df$Height - mean(df$Height))) /
-  ((nrow(df)-1) * sd(df$Wr.Hnd) * sd(df$Height))
+DF <- survey %>% dplyr::select(Wr.Hnd, Height) %>% na.omit()
+sum((DF$Wr.Hnd - mean(DF$Wr.Hnd)) *
+      (DF$Height - mean(DF$Height))) /
+  ((nrow(DF)-1) * sd(DF$Wr.Hnd) * sd(DF$Height))
 
 ## ------------------------------------------------------------------------
 str(cor.test)
@@ -163,7 +163,7 @@ df <- sum(complete.cases(survey[,c("Wr.Hnd", "Height")]))-2
 # df <- (survey %>% select(Wr.Hnd, Height) %>% 
 #        na.omit() %>% nrow())-2 
 
-tstat <- r/sqrt((1 - r^2)*df)
+tstat <- r/sqrt((1 - r^2)/df)
 tstat
 
 pvalue <- 2*pt(q=-abs(tstat), df=df)
