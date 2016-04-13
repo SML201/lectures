@@ -592,7 +592,7 @@ A model is *nested* within another model if their difference is simply the absen
 
 The null hypothesis is that the additional terms have coefficients equal to zero, and the alternative hypothesis is that at least one coefficient is nonzero.
 
-Both versions of ANOVA can be described in a signle, elegant mathematical framework.
+Both versions of ANOVA can be described in a single, elegant mathematical framework.
 
 ## Comparing Two Models <br> with `anova()`
 
