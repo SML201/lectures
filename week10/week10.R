@@ -11,7 +11,7 @@ library("dplyr")
 library("broom")
 set.seed(201)
 
-## ---- echo="FALSE"-------------------------------------------------------
+## ---- echo=FALSE, include=FALSE------------------------------------------
 library("MASS")
 data("survey", package="MASS")
 
@@ -296,6 +296,28 @@ plot(ldiam_fit, which=1)
 
 ## ---- cache=TRUE---------------------------------------------------------
 plot(ldiam_fit, which=2)
+
+## ---- echo=FALSE---------------------------------------------------------
+set.seed(123)
+x <- rep(1:52, 10)
+z <- rep(1:10, 52)
+z <- as.integer(sort(z) + 2000)
+y <- 50 + (3000/52)*(52-abs(20-x)) + rnorm(520, sd=200)
+y <- pmax(1, y)
+pollen_study <- tbl_df(data.frame(week=x, year=z, pollen=y))
+
+## ------------------------------------------------------------------------
+pollen_study
+
+## ------------------------------------------------------------------------
+ggplot(pollen_study) + geom_point(aes(x=week, y=pollen))
+
+## ------------------------------------------------------------------------
+pollen_study <- pollen_study %>%  
+                       mutate(week_new = abs(week-20))
+
+## ------------------------------------------------------------------------
+ggplot(pollen_study) + geom_point(aes(x=week_new, y=pollen))
 
 ## ------------------------------------------------------------------------
 sessionInfo()

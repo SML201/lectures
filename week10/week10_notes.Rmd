@@ -589,7 +589,7 @@ A model is *nested* within another model if their difference is simply the absen
 
 The null hypothesis is that the additional terms have coefficients equal to zero, and the alternative hypothesis is that at least one coefficient is nonzero.
 
-Both versions of ANOVA can be described in a signel, elegant matheamtical framework.
+Both versions of ANOVA can be described in a signle, elegant mathematical framework.
 
 ## Comparing Two Models <br> with `anova()`
 
@@ -714,6 +714,47 @@ plot(ldiam_fit, which=1)
 
 ```{r, cache=TRUE}
 plot(ldiam_fit, which=2)
+```
+
+## Tree Pollen Study
+
+```{r, echo=FALSE}
+set.seed(123)
+x <- rep(1:52, 10)
+z <- rep(1:10, 52)
+z <- as.integer(sort(z) + 2000)
+y <- 50 + (3000/52)*(52-abs(20-x)) + rnorm(520, sd=200)
+y <- pmax(1, y)
+pollen_study <- tbl_df(data.frame(week=x, year=z, pollen=y))
+```
+
+Suppose that we have a study where tree pollen measurements are averaged every week, and these data are recorded for 10 years.
+
+```{r}
+pollen_study
+```
+
+## Tree Pollen Count by Week
+
+```{r}
+ggplot(pollen_study) + geom_point(aes(x=week, y=pollen))
+```
+
+## A Clever Transformation
+
+We can see there is a linear relationship between `pollen` and `week` if we transform `week` to be number of weeks from the peak week.
+
+```{r}
+pollen_study <- pollen_study %>%  
+                       mutate(week_new = abs(week-20))
+```
+
+Note that this is a very different transformation from taking a log or power transformation.
+
+## `week` Transformed
+
+```{r}
+ggplot(pollen_study) + geom_point(aes(x=week_new, y=pollen))
 ```
 
 # Extras
