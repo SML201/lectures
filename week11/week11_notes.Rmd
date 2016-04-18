@@ -245,7 +245,7 @@ Figure credit: [*ISL*](http://www-bcf.usc.edu/~gareth/ISL/)
 
 # Trade-offs
 
-## Two Trade-offs
+## Some Trade-offs
 
 There are several important trade-offs encountered in prediction or learning:
 
