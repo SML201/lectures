@@ -188,9 +188,9 @@ For regression, we calculate the mean-squared error:
 
 $$\mbox{MSE} = \frac{1}{n} \sum_{i=1}^n \left(y_i - \hat{f}(x_i)\right)^2.$$
 
-For classificaiton, we calculate the misclassification rate:
+For classification, we calculate the misclassification rate:
 
-$$\mbox{MCR} = \frac{1}{n} \sum_{i=1}^n 1[y_i = \hat{f}(x_i)],$$
+$$\mbox{MCR} = \frac{1}{n} \sum_{i=1}^n 1[y_i \not= \hat{f}(x_i)],$$
 
 where $1[\cdot]$ is 0 or 1 whether the argument is false or true, respectively.
 
@@ -280,11 +280,328 @@ Figure credit: [*ISL*](http://www-bcf.usc.edu/~gareth/ISL/)
 
 # Logistic Regression
 
+## Definition
+
+Logistic regression models Binomial distributed response variable in terms of linear combinations of explanatory variables.
+
+## Example: Grad School Admissions
+
+```{r}
+mydata <- 
+  read.csv("http://www.ats.ucla.edu/stat/data/binary.csv")
+dim(mydata)
+head(mydata)
+```
+
+Data and analysis courtesy of <http://www.ats.ucla.edu/stat/r/dae/logit.htm>.
+
+
+## Explore the Data
+
+```{r}
+apply(mydata, 2, mean)
+apply(mydata, 2, sd)
+
+table(mydata$admit, mydata$rank)
+```
+
+----
+
+```{r}
+ggplot(data=mydata) +
+  geom_boxplot(aes(x=as.factor(admit), y=gre))
+```
+
+----
+
+```{r}
+ggplot(data=mydata) +
+  geom_boxplot(aes(x=as.factor(admit), y=gpa))
+```
+
+## The Model
+
+Suppose we observe data $(x_{11}, x_{21}, \ldots, x_{d1}, y_1), \ldots$, $(x_{1n}, x_{2n}, \ldots, x_{dn}, y_n)$.  We have a response variable $y_i$ and $d$ explanatory variables $(x_{1i}, x_{2i}, \ldots, x_{di})$ per unit of observation.
+
+The assumption is that $y$ is a realization from a $Y \sim \mbox{Binomia}(1,p)$ distribution where:
+
+$$\operatorname{log}\left( \frac{p}{1-p}\right) =
+\operatorname{log}\left( \frac{\operatorname{Pr}(Y=1)}{\operatorname{Pr}(Y=0)}\right) = 
+\beta_0 + \beta_1 X_1 + \beta_2 X_2 + \ldots + \beta_d X_d
+$$
+
+## Logit Function
+
+The logit function is
+
+$$
+\operatorname{logit}(p) = \operatorname{log}\left( \frac{p}{1-p}\right)
+$$
+
+for $0 < p < 1$.  The inverse logit function is
+
+$$
+\operatorname{logit}^{-1}(x) = \frac{e^x}{1+e^x}.
+$$
+
+## Fitting the Model
+
+Logistic regression models are fit by finding the [maximum likelihood estimate](https://en.wikipedia.org/wiki/Maximum_likelihood) of $p$ through and algorithm called [iteratively reweighted least squares](https://en.wikipedia.org/wiki/Iteratively_reweighted_least_squares).
+
+## Logistic Regression in R
+
+```{r}
+mydata$rank <- factor(mydata$rank, levels=c(1, 2, 3, 4))
+myfit <- glm(admit ~ gre + gpa + rank, 
+             data = mydata, family = "binomial")
+myfit
+```
+
+## Summary of Fit
+
+```{r}
+summary(myfit)
+```
+
+## ANOVA of Fit
+
+```{r}
+anova(myfit, test="Chisq")
+```
+
+## Example: Contraceptive Use
+
+```{r}
+cuse <- 
+  read.table("http://data.princeton.edu/wws509/datasets/cuse.dat", 
+             header=TRUE)
+dim(cuse)
+head(cuse)
+```
+
+Data and analysis courtesy of <http://data.princeton.edu/R/glms.html>.
+
+## A Different Format
+
+Note that in this data set there are multiple observations per explanatory variable configuration.
+
+The last two columns of the data frame count the successes and failures per configuration.
+
+```{r}
+head(cuse)
+```
+
+## Fitting the Model
+
+When this is the case, we call the `glm()` function slighlty differently.
+
+```{r}
+myfit <- glm(cbind(using, notUsing) ~ age + education + 
+               wantsMore, data=cuse, family = binomial)
+myfit
+```
+
+## Summary of Fit
+
+```{r}
+summary(myfit)
+```
+
+## ANOVA of Fit
+
+```{r}
+anova(myfit, test="Chisq")
+```
+
+## More on this Data Set
+
+See <http://data.princeton.edu/R/glms.html> for more on fitting logistic regression to this data set.
+
+A number of interesting choices are made that reveal more about the data and the ways that logistic regression can be utilized.
+
+
 # Spam Example
 
-# Cross-Validation
+## The Data
+
+We will analyze a data set for determining whether an email is spam or not.  The data can be found [here](https://archive.ics.uci.edu/ml/datasets/Spambase), and it is also available in the [kernal](http://www.inside-r.org/packages/cran/kernlab/docs/spam) R package.
+
+```{r, message=FALSE}
+library("dplyr")
+library("kernlab")
+library("broom")
+data("spam")
+spam <- tbl_df(spam)
+names(spam)
+```
+
+##  Contents of the Data Set
+
+```{r}
+dim(spam)
+head(spam)
+```
+
+## Convert the Response Variable
+
+```{r}
+spam <- spam %>% 
+        mutate(response=as.numeric(type=="spam")) %>% 
+        select(-type)
+mean(spam$response)
+```
+
+## Logistic Regression: 1 Variable
+
+```{r}
+myfit <- glm(response ~ edu, family=binomial, data=spam)
+myfit
+```
+
+## Summary
+
+```{r}
+summary(myfit)
+```
+
+## Logit Function
+
+```{r}
+logit <- function(p, tol=1e-10) {
+  p <- pmin(pmax(tol, p), 1-tol)
+  log(p/(1-p))
+}
+```
+
+## Visualization
+
+```{r}
+plot(spam$edu, myfit$fitted.values)
+```
+
+## Visualization
+
+```{r}
+plot(spam$edu, logit(myfit$fitted.values))
+```
+
+## Logistic Regression: All Variables
+
+```{r}
+myfit <- glm(response ~ ., family=binomial, data=spam)
+x <- tidy(myfit)
+head(x)
+```
+
+## Misclassification Rate (Biased)
+
+```{r}
+pred_response <- as.numeric(myfit$fitted.values >= 0.5)
+mean(pred_response == spam$response)
+```
+
+## Probabilites on Full Data Fit
+
+```{r}
+boxplot(myfit$fitted.values[spam$response==0], 
+        myfit$fitted.values[spam$response==1])
+```
+
+
+## Train and Test Sets
+
+```{r}
+set.seed(210)
+v <- sample(nrow(spam), size=round(2*nrow(spam)/3))
+spam0 <- spam[v,]  ## training data
+spam1 <- spam[-v,]  ## test data
+fit0 <- glm(response ~ ., family=binomial, data=spam0)
+pred_prob <- predict(fit0, newdata=spam1[,-ncol(spam1)], 
+                     type="response")
+```
+
+## Trained Probabilities on Test Set
+
+```{r}
+boxplot(pred_prob[spam1$response==0], 
+        pred_prob[spam1$response==1])
+```
+
+## Misclassification Rate (Unbiased)
+
+```{r}
+pred_response <- as.numeric(pred_prob >= 0.5)
+mean(pred_response == spam1$response)
+```
 
 # A Prediction Framework in R
+
+## The `caret` Package
+
+R has several convenient frameworks for building and evaluating prediction models.
+
+One of them is contained in the package `caret`. 
+
+We will go through an example, courtesy of [this *RPubs* publication](https://rpubs.com/JaysonSunshine/61844).
+
+```{r, message=FALSE, warning=FALSE, cache=TRUE}
+library("caret")
+## remove and reload data to undo my earlier changes
+rm(spam) 
+data("spam", package="kernlab")
+```
+
+## Set Up Training and Test Data
+
+```{r, message=FALSE, warning=FALSE, cache=TRUE}
+set.seed(201)
+inTrain <- createDataPartition(y=spam$type, p=0.6, 
+                               list=FALSE)
+training <-spam[inTrain,]
+testing <- spam[-inTrain,]
+```
+
+## Fit Logistic Model
+
+```{r, message=FALSE, warning=FALSE, cache=TRUE}
+modelFit_glm <- train(type ~., data=training, method="glm")
+modelFit_glm
+```
+
+## Evaluate Logistic
+
+```{r, message=FALSE, warning=FALSE, cache=TRUE}
+predictions <- predict(modelFit_glm, newdata=testing)
+confusionMatrix(predictions, testing$type)
+```
+
+## Fit Support Vector Machine
+
+```{r, message=FALSE, warning=FALSE, cache=TRUE}
+modelFit_svm <- train(type ~., data=training, method="svmLinear")
+modelFit_svm
+```
+
+## Evaluate SVM
+
+```{r, message=FALSE, warning=FALSE, cache=TRUE}
+predictions <- predict(modelFit_svm, newdata=testing)
+confusionMatrix(predictions, testing$type)
+```
+
+## Fit Classification Tree Model
+
+```{r, message=FALSE, warning=FALSE, cache=TRUE}
+modelFit_rpart <- train(type ~., data=training, method="rpart")
+modelFit_rpart
+```
+
+## Evaluate Classification Tree
+
+```{r, message=FALSE, warning=FALSE, cache=TRUE}
+predictions <- predict(modelFit_rpart, newdata=testing)
+confusionMatrix(predictions, testing$type)
+```
 
 # Extras
 
