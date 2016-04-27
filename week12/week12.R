@@ -227,6 +227,78 @@ est_clusters <- data2 %>%
 ggplot(data2) + geom_point(aes(x=x, y=y, color=est_clusters))
 
 ## ------------------------------------------------------------------------
+load("data/weather_data.RData")
+dim(weather_data)
+
+weather_data[1:5, 1:7]
+
+## ------------------------------------------------------------------------
+pca <- function(x, space=c("rows", "columns"), 
+                center=TRUE, scale=FALSE) {
+  space <- match.arg(space)
+  if(space=="columns") {x <- t(x)}
+  x <- t(scale(t(x), center=center, scale=scale))
+  s <- svd(x)
+  loading <- s$u
+  colnames(loading) <- paste0("Loading", 1:ncol(loading))
+  rownames(loading) <- rownames(x)
+  pc <- diag(s$d) %*% t(s$v)
+  rownames(pc) <- paste0("PC", 1:nrow(pc))
+  colnames(pc) <- colnames(x)
+  pve <- s$d^2 / sum(s$d^2)
+  if(space=="columns") {pc <- t(pc); loading <- t(loading)}
+  return(list(pc=pc, loading=loading, pve=pve))
+}
+
+## ------------------------------------------------------------------------
+mypca <- pca(weather_data, space="rows")
+
+names(mypca)
+dim(mypca$pc)
+dim(mypca$loading)
+
+## ------------------------------------------------------------------------
+mypca$pc[1:3, 1:3]
+mypca$loading[1:3, 1:3]
+
+## ------------------------------------------------------------------------
+day_of_the_year <- as.numeric(colnames(weather_data))
+data.frame(day=day_of_the_year, PC1=mypca$pc[1,]) %>%
+  ggplot() + geom_point(aes(x=day, y=PC1), size=2)
+
+## ------------------------------------------------------------------------
+data.frame(day=day_of_the_year, PC2=mypca$pc[2,]) %>%
+  ggplot() + geom_point(aes(x=day, y=PC2), size=2)
+
+## ------------------------------------------------------------------------
+data.frame(PC1=mypca$pc[1,], PC2=mypca$pc[2,]) %>%
+  ggplot() + geom_point(aes(x=PC1, y=PC2), size=2)
+
+## ------------------------------------------------------------------------
+data.frame(Component=1:length(mypca$pve), PVE=mypca$pve) %>%
+  ggplot() + geom_point(aes(x=Component, y=PVE), size=2)
+
+## ------------------------------------------------------------------------
+# mean centered weather data
+weather_data_mc <- weather_data - rowMeans(weather_data)
+
+# difference between the PC projections and the data
+# the small sum is just machine imprecision
+sum(abs(weather_data_mc - mypca$loading %*% mypca$pc))
+
+## ------------------------------------------------------------------------
+sum(mypca$loading[,1]^2)
+
+apply(mypca$loading, 2, function(x) {sum(x^2)})
+
+## ------------------------------------------------------------------------
+cor(mypca$pc[1,], mypca$pc[2,])
+cor(mypca$pc[1,], mypca$pc[3,])
+cor(mypca$pc[1,], mypca$pc[12,])
+cor(mypca$pc[5,], mypca$pc[27,])
+# etc...
+
+## ------------------------------------------------------------------------
 sessionInfo()
 
 ## ----converttonotes, include=FALSE, cache=FALSE--------------------------

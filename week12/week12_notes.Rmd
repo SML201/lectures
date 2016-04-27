@@ -555,11 +555,288 @@ est_clusters <- data2 %>%
 ggplot(data2) + geom_point(aes(x=x, y=y, color=est_clusters))
 ```
 
-# Dimension Reduction
+# Dimensionality Reduction
 
-# Principal Components Analysis
+## Weather Data
+
+This is a subset of the weather data from Project 3:
+
+```{r}
+load("data/weather_data.RData")
+dim(weather_data)
+
+weather_data[1:5, 1:7]
+```
+
+This matrix contains temperature data on `r ncol(weather_data)` days and `r nrow(weather_data)` stations that were randomly selected.
+
+
+## Goal
+
+The goal of dimensionality reduction is to extract low dimensional representations of high dimensional data that are useful for visualization, exploration, inference, or predicition.
+
+The low dimensional representations should capture key sources of variation in the data.
+
+## Some Methods
+
+- Principal component analysis
+- Singular value decomposition 
+- Vector quantization
+- Self-organizing maps
+- Multidimensional scaling
+- Latent variable modeling
+
+# Principal Component Analysis
+
+## Goal
+
+For a given set of variables, principal component analysis (PCA) finds (constrained) weighted sums of the variables that capture the maximum level of variation in the data.
+
+Specifically, the first principal component is the weighted sum of the variables that results in a component with the highest variation.  
+
+This component is then regressed out of the data, and the second principal component is obtained on the resulting residuals.  
+
+This process is repeated until there is no variation left in the data.
+
+## Procedure
+
+Suppose we have $p$ variables, each with $n$ observations:
+
+\begin{eqnarray}
+\pmb{x_1} & = & (x_{11}, x_{12}, \ldots, x_{1n}) \\
+\pmb{x_2} & = & (x_{21}, x_{22}, \ldots, x_{2n}) \\
+\ & \vdots & \ \\
+\pmb{x_p} & = & (x_{p1}, x_{p2}, \ldots, x_{pn})
+\end{eqnarray}
+
+Consider all possible weighted sums of these variables
+
+$$\tilde{\pmb{x}} = \sum_{i=1}^{p} w_i \pmb{x_i}$$
+
+where we constrain $\sum_{i=1}^{p} w_i^2 = 1$.
+
+## Procedure
+
+The first principal component (PC1) is the set of weights that produces a vector $\tilde{\pmb{x}}$ that maximizes
+
+$$\tilde{x}_{1}^2 + \tilde{x}_{2}^2 + \cdots \tilde{x}_{n}^2.$$
+
+One this is found, then a least squares linear regression of each $\pmb{x}_i$ on $\tilde{\pmb{x}}$ (with no intercept) is performed and the residuals are obtained.  The next principal component (PC2) is then calculated using the same procedure. 
+
+This process is repeated up to min$(p, n)$ times.
+
+## Singular Value Decomposition
+
+Singular value decomposition (SVD) is a numerical matrix decomposition that can find all PCs at once.  
+
+This is an advanced topic.  
+
+See *Principal Component Analysis* by I.T. Jolliffe for a  thorough account of PCA, including a clear explanation on the relationship between PCA and SVD (in Chapter 1).
+
+## Mean Centering and Covariance
+
+PCA can be motivated and derived in terms of covariance matrices.
+
+We will not cover that here, but it is definitely worth learning.
+
+One thing we want to note is that it is usually the case that one centers each variable by its sample mean before performing PCA (i.e., subtract the variable's sample mean from each observation on that variable).  This allows the optimization to be about maximizing sample variance of the component and provides the underlying connection to covariances.
+
+## My PCA Function
+
+```{r}
+pca <- function(x, space=c("rows", "columns"), 
+                center=TRUE, scale=FALSE) {
+  space <- match.arg(space)
+  if(space=="columns") {x <- t(x)}
+  x <- t(scale(t(x), center=center, scale=scale))
+  s <- svd(x)
+  loading <- s$u
+  colnames(loading) <- paste0("Loading", 1:ncol(loading))
+  rownames(loading) <- rownames(x)
+  pc <- diag(s$d) %*% t(s$v)
+  rownames(pc) <- paste0("PC", 1:nrow(pc))
+  colnames(pc) <- colnames(x)
+  pve <- s$d^2 / sum(s$d^2)
+  if(space=="columns") {pc <- t(pc); loading <- t(loading)}
+  return(list(pc=pc, loading=loading, pve=pve))
+}
+```
+
+## How It Works (Input)
+
+Input:
+
+- `x`: a matrix of numerical values
+- `space`: either `"rows"` or `"columns"`, denoting which dimension contains the variables
+- `center`: if `TRUE` then the variables are mean centered before calculating PCs
+- `scaled`: if `TRUE` then the variables are std dev scaled before calculating PCs
+
+## How It Works (Output)
+
+Output is a list with the following items:
+
+- `pc`: a matrix of all possible PCs
+- `loading`:  the weights or "loadings" that determined each PC
+- `pve`: the proportion of variation explained by each PC
+
+Note that the rows or columns of `pc` and `loading` have names to let you know on which dimension the values are organized.
+
+## Application to Weather Data
+
+
+```{r}
+mypca <- pca(weather_data, space="rows")
+
+names(mypca)
+dim(mypca$pc)
+dim(mypca$loading)
+```
+
+```{r}
+mypca$pc[1:3, 1:3]
+mypca$loading[1:3, 1:3]
+```
+
+## PC1 vs Time
+
+```{r}
+day_of_the_year <- as.numeric(colnames(weather_data))
+data.frame(day=day_of_the_year, PC1=mypca$pc[1,]) %>%
+  ggplot() + geom_point(aes(x=day, y=PC1), size=2)
+```
+
+## PC2 vs Time
+
+```{r}
+data.frame(day=day_of_the_year, PC2=mypca$pc[2,]) %>%
+  ggplot() + geom_point(aes(x=day, y=PC2), size=2)
+```
+
+## PC1 vs PC2
+
+```{r}
+data.frame(PC1=mypca$pc[1,], PC2=mypca$pc[2,]) %>%
+  ggplot() + geom_point(aes(x=PC1, y=PC2), size=2)
+```
+
+## PC Biplots
+
+Sometimes it is really informative to plot a PC versus another PC (as in the previous slide).  This is called a *PC biplot*.
+
+It is possible that interesting subgroups or clusters of *observations* will emerge.
+
+This does not appear to be the case in the weather data set, however, due to what we observe on the next slide.
+
+## Proportion of Variance Explained
+
+```{r}
+data.frame(Component=1:length(mypca$pve), PVE=mypca$pve) %>%
+  ggplot() + geom_point(aes(x=Component, y=PVE), size=2)
+```
+
+## PCs Reproduce the Data
+
+We can multiple the loadings matrix by the PCs matrix to reproduce the data:
+```{r}
+# mean centered weather data
+weather_data_mc <- weather_data - rowMeans(weather_data)
+
+# difference between the PC projections and the data
+# the small sum is just machine imprecision
+sum(abs(weather_data_mc - mypca$loading %*% mypca$pc))
+```
+
+## Loadings 
+
+The sum of squared weights -- i.e., loadings -- equals one for each component:
+
+```{r}
+sum(mypca$loading[,1]^2)
+
+apply(mypca$loading, 2, function(x) {sum(x^2)})
+```
+
+## Pairs of PCs Have Correlaton Zero
+
+PCs by contruction have sample correlation equal to zero:
+
+```{r}
+cor(mypca$pc[1,], mypca$pc[2,])
+cor(mypca$pc[1,], mypca$pc[3,])
+cor(mypca$pc[1,], mypca$pc[12,])
+cor(mypca$pc[5,], mypca$pc[27,])
+# etc...
+```
 
 # Summary of SML 201
+
+## What Did We Learn?
+
+- Basics of R
+- Data wrangling
+- Data visualization
+- Exploratory data analysis
+- Probability and random variables
+- Statistical inference
+- Formulating and fitting models
+- Prediction / supervised learning
+- Clustering / unsupervised learning
+- Real data sets and questions are tough
+
+## R
+
+[*Advanced R*, Wickham](http://adv-r.had.co.nz)
+
+[*R Packages*, Wickham](wickham r packages)
+
+[*Introductory Statistics with R*, Dalgaard](http://www.amazon.com/Introductory-Statistics-R-Computing/dp/0387790535/)
+
+[*R Cookbook*, Teetor](http://shop.oreilly.com/product/9780596809164.do)
+
+## Visualization
+
+[*R Graphics Cookbook*, Chang](http://www.cookbook-r.com)
+
+[*Visualizing Data*, Cleveland](http://amzn.com/0963488406)
+
+[*The Visual Display of Quantitative Information*, Tufte](http://amzn.com/0961392142)
+
+## Modeling
+
+[*Statistical Models: Theory and Practice*, Freedman](http://www.amazon.com/Statistical-Models-Practice-David-Freedman/dp/0521743850/)
+
+[*Nonparametric Regression and Generalized Linear Models: A roughness penalty approach*, Green and Silverman](http://www.amazon.com/Nonparametric-Regression-Generalized-Linear-Models/dp/0412300400/)
+
+[*Bayesian Data Analysis*, Gelman et al.](http://www.amazon.com/Bayesian-Analysis-Chapman-Statistical-Science/dp/1439840954/)
+
+## Statistical Inference
+
+[*All of Statistics*, Wasserman](http://www.amazon.com/All-Statistics-Statistical-Inference-Springer/dp/0387402721/)
+
+[*Statistical Inference*, Casella and Berger](http://www.amazon.com/Statistical-Inference-Wadsworth-Statistics-Probability/dp/0534119581/)
+
+[*An Introduction to the Bootstrap*, Efron and Tibshirani](http://www.amazon.com/Introduction-Bootstrap-Monographs-Statistics-Probability/dp/0412042312/)
+
+[*A First Course in Bayesian Statistical Methods*, Hoff](http://amzn.com/0387922997)
+
+## Machine Learning
+
+[*An Introduction to Statistical Learning: with Applications in R*, James et al.](http://www-bcf.usc.edu/~gareth/ISL/)
+
+[*Elements of Statistical Learning*, Hastie, Tibshirani, and Friedman](http://statweb.stanford.edu/~tibs/ElemStatLearn/)
+
+[*Machine Learning: A Probabilistic Perspective*, Murphy](http://www.amazon.com/Machine-Learning-Probabilistic-Perspective-Computation/dp/0262018020/)
+
+[*Pattern Recognition and Machine Learning*, Bishop](http://www.amazon.com/Pattern-Recognition-Learning-Information-Statistics/dp/0387310738/)
+
+## SML UG Certificate
+
+<http://csml.princeton.edu/education/undergraduate-certificate-program>
+
+- Requires five courses in total
+- One fundamentals of statistics, one fundamentals of ML
+- SML 201 currently counts as one of the three additional courses
+- See the web site for further details
 
 # Extras
 
