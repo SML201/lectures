@@ -576,7 +576,7 @@ This matrix contains temperature data on `r ncol(weather_data)` days and `r nrow
 
 ## Goal
 
-The goal of dimensionality reduction is to extract low dimensional representations of high dimensional data that are useful for visualization, exploration, inference, or predicition.
+The goal of dimensionality reduction is to extract low dimensional representations of high dimensional data that are useful for visualization, exploration, inference, or prediction.
 
 The low dimensional representations should capture key sources of variation in the data.
 
@@ -672,7 +672,7 @@ Input:
 - `x`: a matrix of numerical values
 - `space`: either `"rows"` or `"columns"`, denoting which dimension contains the variables
 - `center`: if `TRUE` then the variables are mean centered before calculating PCs
-- `scaled`: if `TRUE` then the variables are std dev scaled before calculating PCs
+- `scale`: if `TRUE` then the variables are std dev scaled before calculating PCs
 
 ## How It Works (Output)
 
