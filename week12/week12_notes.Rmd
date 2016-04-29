@@ -579,6 +579,7 @@ The low dimensional representations should capture key sources of variation in t
 
 ## Some Methods
 
+- Cluster analysis
 - Principal component analysis
 - Singular value decomposition 
 - Vector quantization
@@ -621,9 +622,9 @@ The first principal component (PC1) is the set of weights that produces a vector
 
 $$\tilde{x}_{1}^2 + \tilde{x}_{2}^2 + \cdots \tilde{x}_{n}^2.$$
 
-One this is found, then a least squares linear regression of each $\pmb{x}_i$ on $\tilde{\pmb{x}}$ (with no intercept) is performed and the residuals are obtained.  The next principal component (PC2) is then calculated using the same procedure. 
+Once this is found, then a least squares linear regression of each $\pmb{x}_i$ on $\tilde{\pmb{x}}$ (with no intercept) is performed and the residuals are obtained.  The next principal component (PC2) is then calculated using the same procedure, and it is regressed out from the to obtain a new set of residuals for calculating PC3. 
 
-This process is repeated up to min$(p, n)$ times.
+This iterative process is repeated to obtain up to min$(p, n)$ PCs.
 
 ## Singular Value Decomposition
 
